@@ -1,0 +1,7 @@
+:80 {
+	root * /usr/share/caddy
+	encode zstd gzip
+	# SPA-Fallback fuer client-seitiges Routing (react-router-dom).
+	try_files {path} /index.html
+	file_server
+}

@@ -1,0 +1,25 @@
+# Optionale Ueberlagerung fuer den OTel-Collector (Architekturplan
+# Abschnitt 16), analog zu docker-compose.dev.yml/.prod.yml:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up
+#
+# Bewusst NICHT in der Basisdatei: ein Privat/Home-Server-Betrieb, der
+# OTEL_EXPORTER_OTLP_ENDPOINT nie setzt (Standardfall, siehe .env.example),
+# soll keinen zusaetzlichen, staendig laufenden Collector-Container
+# bezahlen. Wer diese Ueberlagerung nutzt, setzt zusaetzlich
+# OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318 in .env, damit
+# api/worker tatsaechlich dorthin senden (siehe
+# services/api/app/core/tracing.py, services/worker/worker/tracing.py).
+#
+# Liefert bewusst kein Prometheus/Grafana mit - siehe
+# infra/monitoring/README.md.
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.116.1
+    restart: unless-stopped
+    volumes:
+      - ./infra/monitoring/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4318:4318"
+    networks: [finanzplaner]

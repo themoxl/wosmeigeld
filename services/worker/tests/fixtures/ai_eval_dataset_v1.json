@@ -1,0 +1,257 @@
+{
+  "dataset_version": "v1",
+  "description": "Fester Evaluationsdatensatz fuer die KI-Kategorisierung (Architekturplan Abschnitt 15). Realistische deutsche Buchungstexte mit erwarteter Kategorie. Versioniert: Aenderungen an Faellen erfordern eine neue Version, damit Trefferquoten ueber die Zeit vergleichbar bleiben.",
+  "min_accuracy": 0.8,
+  "categories": [
+    {
+      "id": "11111111-1111-4111-8111-000000000001",
+      "name": "Lebensmittel",
+      "group": "Variable Kosten"
+    },
+    {
+      "id": "11111111-1111-4111-8111-000000000002",
+      "name": "Restaurant & Cafe",
+      "group": "Freizeit"
+    },
+    { "id": "11111111-1111-4111-8111-000000000003", "name": "Mobilitaet", "group": "Fixkosten" },
+    {
+      "id": "11111111-1111-4111-8111-000000000004",
+      "name": "Wohnen & Miete",
+      "group": "Fixkosten"
+    },
+    {
+      "id": "11111111-1111-4111-8111-000000000005",
+      "name": "Versicherungen",
+      "group": "Fixkosten"
+    },
+    { "id": "11111111-1111-4111-8111-000000000006", "name": "Gesundheit", "group": "Fixkosten" },
+    {
+      "id": "11111111-1111-4111-8111-000000000007",
+      "name": "Abos & Streaming",
+      "group": "Freizeit"
+    },
+    {
+      "id": "11111111-1111-4111-8111-000000000008",
+      "name": "Kleidung",
+      "group": "Variable Kosten"
+    },
+    { "id": "11111111-1111-4111-8111-000000000009", "name": "Einkommen", "group": "Einnahmen" },
+    {
+      "id": "11111111-1111-4111-8111-000000000010",
+      "name": "Sonstiges",
+      "group": "Variable Kosten"
+    }
+  ],
+  "cases": [
+    {
+      "id": "case-01",
+      "payee_raw": "REWE SAGT DANKE 12345",
+      "purpose": "Einkauf Lebensmittel",
+      "amount_minor": -4211,
+      "expected_category": "Lebensmittel"
+    },
+    {
+      "id": "case-02",
+      "payee_raw": "EDEKA ZENTRALE FIL 0815",
+      "purpose": "Wocheneinkauf",
+      "amount_minor": -6790,
+      "expected_category": "Lebensmittel"
+    },
+    {
+      "id": "case-03",
+      "payee_raw": "ALDI SUED SAGT DANKE",
+      "purpose": "Kartenzahlung Girocard",
+      "amount_minor": -2345,
+      "expected_category": "Lebensmittel"
+    },
+    {
+      "id": "case-04",
+      "payee_raw": "LIDL DIENSTLEISTUNG GMBH",
+      "purpose": "Einkauf Filiale Nord",
+      "amount_minor": -3312,
+      "expected_category": "Lebensmittel"
+    },
+    {
+      "id": "case-05",
+      "payee_raw": "Kaufland Filiale Berlin",
+      "purpose": "Lebensmitteleinkauf",
+      "amount_minor": -8899,
+      "expected_category": "Lebensmittel"
+    },
+    {
+      "id": "case-06",
+      "payee_raw": "Baeckerei Steinecke",
+      "purpose": "Fruehstueck Broetchen",
+      "amount_minor": -520,
+      "expected_category": "Restaurant & Cafe"
+    },
+    {
+      "id": "case-07",
+      "payee_raw": "MCDONALDS DEUTSCHLAND LLC",
+      "purpose": "Mittagessen",
+      "amount_minor": -1149,
+      "expected_category": "Restaurant & Cafe"
+    },
+    {
+      "id": "case-08",
+      "payee_raw": "Ristorante Da Vinci",
+      "purpose": "Abendessen zu zweit",
+      "amount_minor": -6800,
+      "expected_category": "Restaurant & Cafe"
+    },
+    {
+      "id": "case-09",
+      "payee_raw": "ARAL TANKSTELLE 1234 BERLIN",
+      "purpose": "Tanken Super E10",
+      "amount_minor": -7850,
+      "expected_category": "Mobilitaet"
+    },
+    {
+      "id": "case-10",
+      "payee_raw": "Shell Deutschland Oil GmbH",
+      "purpose": "Kraftstoff",
+      "amount_minor": -6420,
+      "expected_category": "Mobilitaet"
+    },
+    {
+      "id": "case-11",
+      "payee_raw": "DB Vertrieb GmbH",
+      "purpose": "Fahrkarte ICE Hamburg",
+      "amount_minor": -4990,
+      "expected_category": "Mobilitaet"
+    },
+    {
+      "id": "case-12",
+      "payee_raw": "BVG Fahrausweise",
+      "purpose": "Monatskarte AB",
+      "amount_minor": -8600,
+      "expected_category": "Mobilitaet"
+    },
+    {
+      "id": "case-13",
+      "payee_raw": "Hausverwaltung Meier GmbH",
+      "purpose": "Miete August 2026",
+      "amount_minor": -95000,
+      "expected_category": "Wohnen & Miete"
+    },
+    {
+      "id": "case-14",
+      "payee_raw": "Stadtwerke Muenchen GmbH",
+      "purpose": "Abschlag Strom",
+      "amount_minor": -8900,
+      "expected_category": "Wohnen & Miete"
+    },
+    {
+      "id": "case-15",
+      "payee_raw": "HUK COBURG VERS AG",
+      "purpose": "Beitrag Kfz-Versicherung",
+      "amount_minor": -12300,
+      "expected_category": "Versicherungen"
+    },
+    {
+      "id": "case-16",
+      "payee_raw": "Allianz Lebensversicherung AG",
+      "purpose": "Monatsbeitrag Police 998877",
+      "amount_minor": -7500,
+      "expected_category": "Versicherungen"
+    },
+    {
+      "id": "case-17",
+      "payee_raw": "Sonnen-Apotheke Inh. Weber",
+      "purpose": "Rezeptgebuehr",
+      "amount_minor": -1000,
+      "expected_category": "Gesundheit"
+    },
+    {
+      "id": "case-18",
+      "payee_raw": "Zahnarztpraxis Dr. Klein",
+      "purpose": "Prophylaxe Eigenanteil",
+      "amount_minor": -8500,
+      "expected_category": "Gesundheit"
+    },
+    {
+      "id": "case-19",
+      "payee_raw": "Fielmann Filiale 23",
+      "purpose": "Brillenfassung",
+      "amount_minor": -24900,
+      "expected_category": "Gesundheit"
+    },
+    {
+      "id": "case-20",
+      "payee_raw": "NETFLIX.COM AMSTERDAM",
+      "purpose": "Monatsabo Standard",
+      "amount_minor": -1799,
+      "expected_category": "Abos & Streaming"
+    },
+    {
+      "id": "case-21",
+      "payee_raw": "Spotify AB",
+      "purpose": "Premium Family",
+      "amount_minor": -1799,
+      "expected_category": "Abos & Streaming"
+    },
+    {
+      "id": "case-22",
+      "payee_raw": "Amazon Prime AMZN.COM",
+      "purpose": "Jahresgebuehr",
+      "amount_minor": -8900,
+      "expected_category": "Abos & Streaming"
+    },
+    {
+      "id": "case-23",
+      "payee_raw": "ZALANDO SE",
+      "purpose": "Bestellung 4711",
+      "amount_minor": -8990,
+      "expected_category": "Kleidung"
+    },
+    {
+      "id": "case-24",
+      "payee_raw": "DEICHMANN SE",
+      "purpose": "Sneaker Gr. 43",
+      "amount_minor": -5995,
+      "expected_category": "Kleidung"
+    },
+    {
+      "id": "case-25",
+      "payee_raw": "Musterfirma GmbH & Co KG",
+      "purpose": "Gehalt August, Ueberweisung von DE89370400440532013000",
+      "amount_minor": 285000,
+      "expected_category": "Einkommen"
+    },
+    {
+      "id": "case-26",
+      "payee_raw": "Personalabteilung Nord",
+      "purpose": "Lohn Juli 2026",
+      "amount_minor": 178000,
+      "expected_category": "Einkommen"
+    },
+    {
+      "id": "case-27",
+      "payee_raw": "Blumen Krause",
+      "purpose": "Geburtstagsstrauss",
+      "amount_minor": -2500,
+      "expected_category": "Sonstiges"
+    },
+    {
+      "id": "case-28",
+      "payee_raw": "Buchhandlung Lesezeichen",
+      "purpose": "Fachbuch",
+      "amount_minor": -3990,
+      "expected_category": "Sonstiges"
+    },
+    {
+      "id": "case-29",
+      "payee_raw": "Parkhaus City Center",
+      "purpose": "Parkgebuehr Kartenzahlung 4045567890123456",
+      "amount_minor": -450,
+      "expected_category": "Mobilitaet"
+    },
+    {
+      "id": "case-30",
+      "payee_raw": "Fitnessstudio Bodyline",
+      "purpose": "Monatsbeitrag Mitgliedsnr 9988776655",
+      "amount_minor": -2990,
+      "expected_category": "Gesundheit"
+    }
+  ]
+}

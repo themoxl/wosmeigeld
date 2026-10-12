@@ -1,0 +1,72 @@
+# Alle drei Images bauen mit dem Repo-Wurzelverzeichnis als Kontext (siehe
+# docker-compose.yml / .dev.yml / .prod.yml). Docker packt diesen Kontext
+# vollstaendig ein und schickt ihn an den Daemon - was hier nicht
+# ausgeschlossen ist, landet im Build-Cache, auch wenn kein COPY es anfasst.
+#
+# Deshalb Allowlist statt Denylist: erst alles ausschliessen, dann genau die
+# Pfade zurueckholen, die die Dockerfiles per COPY brauchen. Eine Denylist
+# muesste jede neue lokale Datei nachtragen - Datenbankabzug, Backup,
+# Schluesselspeicher, NAS-Konfiguration, Haushaltsexport - und genau das ist
+# vorher schiefgegangen: .backups/, db-snapshots/, infra/nas/ und
+# LANIFU-SECRETS.txt lagen im Kontext, obwohl .gitignore sie kennt.
+#
+# Nach einer Aenderung an den COPY-Zeilen eines Dockerfiles gehoert die
+# passende Zeile hier ergaenzt, sonst bricht der Build mit "file not found".
+*
+
+# --- pnpm-Workspace-Wurzel (apps/web/Dockerfile) ---
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!tsconfig.base.json
+
+# --- Web-Build ---
+!apps/web
+!packages
+
+# apps/mobile ist Workspace-Mitglied ("apps/*" in pnpm-workspace.yaml). Ohne
+# seine package.json bricht `pnpm install --frozen-lockfile` ab, weil ein
+# Importer aus der Lockdatei im Workspace fehlt. Der Rest des Ordners wird
+# nicht gebaut und gehoert nicht in den Kontext - dort liegen unter anderem
+# der Android-Schluesselspeicher und die Signierdaten.
+!apps/mobile/package.json
+
+# --- API und Worker ---
+!services/api/requirements.txt
+!services/api/app
+!services/api/alembic.ini
+!services/api/alembic
+!services/worker/requirements.txt
+!services/worker/worker
+
+# Die Dockerfiles selbst: BuildKit uebertraegt sie zwar getrennt vom Kontext,
+# der klassische Builder liest sie aber daraus.
+!apps/web/Dockerfile
+!services/api/Dockerfile
+!services/worker/Dockerfile
+
+# --- Innerhalb der freigegebenen Pfade ---
+# Build-Abfall: blaeht den Kontext auf und wird im Image ohnehin neu erzeugt.
+**/node_modules
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/dist
+**/build
+**/.expo
+**/.turbo
+
+# Geheimnisse: doppelter Boden fuer den Fall, dass ein neuer Unterordner
+# freigegeben wird, ohne dass jemand an diese Dateien denkt.
+**/.env
+**/.env.*
+**/*.keystore
+**/*.jks
+**/*.p12
+**/*.pem
+**/*.key
+**/keystore.properties

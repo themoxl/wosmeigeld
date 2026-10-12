@@ -1,0 +1,35 @@
+# Konfiguration fuer den optionalen OTel-Collector (docker-compose.monitoring.yml).
+# Nimmt OTLP-Traces von services/api und services/worker entgegen (siehe
+# app/core/tracing.py bzw. worker/tracing.py, aktiviert ueber
+# OTEL_EXPORTER_OTLP_ENDPOINT). Nur eine Traces-Pipeline: API/Worker senden
+# aktuell ausschliesslich Spans, keine OTel-Metriken (Job-/Importmetriken
+# bleiben bewusst in import_runs/llm_calls in Postgres, siehe
+# docs/BETRIEB.md) - eine Metrik-Pipeline ohne jemals eintreffende Daten
+# waere irrefuehrende Konfiguration.
+#
+# Exporter: debug - Traces landen in "docker compose logs otel-collector",
+# das beweist, dass Daten ankommen, ganz ohne nachgelagerte Infrastruktur.
+# Ein Prometheus-Exporter (fuer eine spaetere Metrik-Pipeline) wird hier
+# bewusst NICHT mitgeliefert, solange keine Metriken gesendet werden - siehe
+# infra/monitoring/README.md ("kein gebuendeltes Prometheus/Grafana").
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+
+exporters:
+  debug:
+    verbosity: normal
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]

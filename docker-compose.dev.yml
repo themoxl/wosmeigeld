@@ -1,0 +1,86 @@
+# Ueberlagerung fuer lokale Entwicklung mit Hot Reload. Standard-Dev-Weg ab
+# Phase 1: lokales Supabase per `supabase start` (siehe supabase/README.md)
+# separat starten, dann:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# .env zeigt per Default auf das lokale Supabase (host.docker.internal, siehe
+# .env.example). Der eigene "postgres"-Dienst wird dafuer NICHT gebraucht.
+#
+# Alternative ohne Supabase (kein Auth/RLS-Test moeglich): das
+# "local-db"-Profil aktiviert stattdessen den schlanken lokalen
+# postgres-Dienst aus der Basisdatei:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml \
+#     --profile local-db up --build
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: dev
+    image: finanzplaner-web-dev
+    command: ["pnpm", "--filter", "@finanzplaner/web", "dev", "--host", "0.0.0.0", "--port", "5173"]
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - web-node-modules:/app/apps/web/node_modules
+    working_dir: /app
+    environment:
+      VITE_API_BASE_URL: http://localhost:8882
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8882", "--reload"]
+    ports:
+      - "8882:8882"
+    volumes:
+      - ./services/api/app:/app/services/api/app
+      - ./services/worker/worker:/app/services/worker/worker
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    volumes:
+      # Beide Baeume gemountet: der Vertragsabgleich laeuft im Worker, sein
+      # Motor liegt aber in services/api (siehe worker/contracts/reconcile.py).
+      - ./services/worker/worker:/app/services/worker/worker
+      - ./services/api/app:/app/services/api/app
+    depends_on:
+      - redis
+
+  periodiq:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    volumes:
+      - ./services/worker/worker:/app/services/worker/worker
+      - ./services/api/app:/app/services/api/app
+    depends_on:
+      - redis
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  caddy:
+    profiles: ["proxy-disabled-in-dev"]
+
+volumes:
+  web-node-modules:

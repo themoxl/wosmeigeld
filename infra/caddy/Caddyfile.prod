@@ -1,0 +1,62 @@
+# Haertung fuer das Betriebsprofil "Produktiv/SaaS" (Architekturplan
+# Abschnitt 4), zusaetzlich zur Basis in infra/caddy/Caddyfile. Wird ueber
+# docker-compose.prod.yml eingebunden statt der Basisdatei - die Basisdatei
+# bleibt fuer "Privat/Home-Server" unveraendert (dort ist z.B. ACME_EMAIL
+# nicht gesetzt, und "email {$ACME_EMAIL}" ohne Wert ist ein harter
+# Parse-Fehler, siehe unten).
+{
+	# Vermeidet Let's-Encrypt-Rate-Limit-/Ablaufwarnungen. Nur in diesem
+	# Profil gesetzt (Pflichtvariable des Prod-Overlays, siehe .env.example).
+	email {$ACME_EMAIL}
+
+	# Bereits Caddys Standardverhalten (Admin-API nur auf dem Loopback-
+	# Interface, nie ueber "ports:" in docker-compose veroeffentlicht) -
+	# hier explizit dokumentiert, damit eine spaetere Aenderung nicht
+	# versehentlich 2019 nach aussen oeffnet.
+	admin localhost:2019
+
+	# Standardmaessig die echte Let's-Encrypt-Produktiv-CA; ueberschreibbar
+	# auf die LE-Staging-CA fuer ratenlimit-sicheres Testen.
+	acme_ca {$CADDY_ACME_CA:https://acme-v02.api.letsencrypt.org/directory}
+}
+
+{$DOMAIN:localhost} {
+	# KI-Feld: NDJSON-Strom eines Laufs (GET /v1/assistant/runs/<id>/stream)
+	# ohne Kompression und ohne Puffer. encode haelt kleine Antworten zurueck,
+	# bis seine Mindestlaenge erreicht ist, und reverse_proxy puffert ohne
+	# flush_interval - der Ping alle 10 s kaeme nicht an, und der Client gaebe
+	# die Verbindung nach 35 s Stille auf. Der Pfad mit Platzhalter in der Mitte
+	# ist laenger als /v1/* und wird deshalb vor dem allgemeinen Block geprueft.
+	@not_assistant_stream not path /v1/assistant/runs/*/stream
+
+	handle /v1/assistant/runs/*/stream {
+		reverse_proxy api:8000 {
+			flush_interval -1
+		}
+	}
+
+	encode @not_assistant_stream zstd gzip
+
+	tls {
+		protocols tls1.2 tls1.3
+	}
+
+	handle /v1/* {
+		reverse_proxy api:8000
+	}
+
+	handle /health {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy web:80
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}

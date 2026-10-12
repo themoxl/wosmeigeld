@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Finanzplaner</title>
+    <!-- Designwahl (Designkasten aus sia_public, Kopien in public/designkasten/
+         nie von Hand aendern, sondern dort aendern und verteilen). Laeuft VOR
+         allem anderen, damit schon der erste Bildaufbau im gewaehlten Design
+         erscheint. Gemerkt in localStorage "finanzplaner:web:design". -->
+    <link rel="stylesheet" href="/designkasten/designs.css" />
+    <script src="/designkasten/designs.js"></script>
+    <script>
+      // Eigene Designs: Klassisch (Standard, Abschnitt 10.1 des Architekturplans:
+      // helle Arbeitsflaeche) und Klassisch Dunkel. Ihre Farben stehen in
+      // src/styles/global.css und sind die Werte aus @finanzplaner/design-tokens;
+      // die Probe hier nennt dieselben Werte (src/test/designs.test.ts prueft das).
+      // spiegeln haelt data-theme="light|dark" passend, fuer die Regeln, die nur
+      // hell und dunkel unterscheiden.
+      Designkasten.start({
+        schluessel: "finanzplaner:web:design",
+        standard: "klassisch",
+        eigene: [
+          {
+            id: "klassisch",
+            name: "Klassisch",
+            text: "Hell, Waldgrün und Gold",
+            art: "Hell",
+            probe: {
+              kopf: "#ffffff",
+              flaeche: "#f7f7f5",
+              feld: "#e4e4e1",
+              a: "#1f6d4c",
+              b: "#c9a34e",
+            },
+            kopfFarbe: "#ffffff",
+          },
+          {
+            id: "klassisch-dunkel",
+            name: "Klassisch Dunkel",
+            text: "Anthrazit, Waldgrün und Gold",
+            art: "Dunkel",
+            probe: {
+              kopf: "#1b1b1e",
+              flaeche: "#121214",
+              feld: "#232326",
+              a: "#5c9c7c",
+              b: "#dfc07e",
+            },
+            kopfFarbe: "#1b1b1e",
+          },
+        ],
+        auswahl: [
+          "klassisch",
+          "light",
+          "klassisch-dunkel",
+          "daemmerung",
+          "oled",
+          "warm",
+          "ember",
+          "dark",
+        ],
+        spiegeln: function (id, design) {
+          document.documentElement.setAttribute(
+            "data-theme",
+            design.art === "Hell" ? "light" : "dark",
+          );
+        },
+      });
+      // Bis zur Designwahl gab es nur Hell/Dunkel unter "finanzplaner:web:theme".
+      // Die alte Wahl wird EINMAL uebernommen; danach gilt nur noch der neue Schluessel.
+      (function () {
+        var alt = null;
+        try {
+          alt = window.localStorage.getItem("finanzplaner:web:theme");
+          if (alt === null) return;
+          window.localStorage.removeItem("finanzplaner:web:theme");
+          if (window.localStorage.getItem("finanzplaner:web:design") !== null) return;
+        } catch (_error) {
+          return;
+        }
+        Designkasten.setze(alt === "dark" ? "klassisch-dunkel" : "klassisch");
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="/designkasten/designwahl.js"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

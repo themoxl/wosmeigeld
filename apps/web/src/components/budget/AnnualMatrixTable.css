@@ -1,0 +1,531 @@
+/* ---------------------------------------------------------------------------
+   Jahresmatrix (apps/web/src/components/budget/AnnualMatrixTable.tsx)
+
+   Vite buendelt diese Datei global - es gibt hier keine Kapselung. Deshalb
+   traegt ausnahmslos jede Klasse das Praefix .budget-matrix und alle lokalen
+   Variablen haengen am Wurzelelement.
+
+   Keine festen Farben ausser in Schatten: alles kommt aus den 13 Semantik-
+   Tokens oder aus color-mix() gegen --color-surface, damit Hell und Dunkel
+   ohne zweite Regelsammlung mitkippen.
+   --------------------------------------------------------------------------- */
+
+.budget-matrix {
+  /* Spaltenraster. Zwoelf Monatsspalten muessen ohne Umbruch nebeneinander
+     stehen, deshalb feste Breiten statt Auto-Layout. */
+  --matrix-label-width: 224px;
+  --matrix-month-width: 62px;
+  --matrix-trend-width: 80px;
+  --matrix-total-width: 92px;
+
+  /* Flaeche, gegen die jede Zelle mischt. Zebra, Hover und Gruppenzeile
+     ueberschreiben sie auf Zeilenebene; weil Custom Properties erben, faerbt
+     das auch die klebende erste Spalte mit - ohne eine zweite Regel. */
+  --matrix-cell-surface: var(--color-surface);
+  --matrix-heat-hue: var(--color-text-secondary);
+  --matrix-heat-alpha: 0%;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+/* --- Werkzeugleiste -------------------------------------------------------- */
+
+.budget-matrix__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.budget-matrix__collapse-all {
+  margin-left: auto;
+}
+
+.budget-matrix__legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.budget-matrix__legend-label {
+  white-space: nowrap;
+}
+
+.budget-matrix__legend-label:first-child {
+  margin-right: var(--space-1);
+}
+
+.budget-matrix__legend-label:last-child {
+  margin-left: var(--space-1);
+}
+
+.budget-matrix__swatch {
+  width: 14px;
+  height: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(
+    in srgb,
+    var(--matrix-heat-hue) var(--matrix-heat-alpha),
+    var(--color-surface)
+  );
+}
+
+/* --- Geruest und Rollbereich ---------------------------------------------- */
+
+.budget-matrix__shell {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+/* Nur dieser Kasten rollt - die Seite selbst bekommt nie eine waagerechte
+   Bildlaufleiste. overscroll-behavior verhindert, dass das Ende der Matrix die
+   Seite mitzieht. */
+.budget-matrix__scroll {
+  position: relative;
+  max-width: 100%;
+  max-height: min(70vh, 760px);
+  overflow: auto;
+  isolation: isolate;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.budget-matrix__scroll:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.budget-matrix__table {
+  width: max-content;
+  min-width: 100%;
+  /* separate statt collapse: nur so bleiben die Rahmen an klebenden Spalten
+     stehen, wenn darunter weggescrollt wird. */
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--color-text-primary);
+  font-size: 12px;
+}
+
+.budget-matrix__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Kopfzeile ------------------------------------------------------------- */
+
+.budget-matrix__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.budget-matrix__table thead .budget-matrix__label,
+.budget-matrix__table thead .budget-matrix__trend,
+.budget-matrix__table thead .budget-matrix__total {
+  z-index: 5;
+  background: var(--color-surface-raised);
+}
+
+.budget-matrix__month {
+  width: var(--matrix-month-width);
+  min-width: var(--matrix-month-width);
+  padding: 5px var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: right;
+}
+
+.budget-matrix__month small {
+  display: block;
+  color: var(--color-highlight);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.budget-matrix__month[data-current="true"] {
+  color: var(--color-highlight);
+}
+
+/* Kuenftige Monate bleiben lesbar, treten aber zurueck - im Ist-Modus stehen
+   dort naturgemaess nur Nullen, im Plan-Modus echte Werte. */
+.budget-matrix__month[data-future="true"] {
+  opacity: 0.6;
+}
+
+/* --- Zeilen ---------------------------------------------------------------- */
+
+.budget-matrix__row > th,
+.budget-matrix__row > td {
+  height: 30px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
+  white-space: nowrap;
+}
+
+.budget-matrix__group tr:nth-child(even) {
+  --matrix-cell-surface: var(--color-surface-raised);
+}
+
+/* Hover faerbt die gesamte Zeile inklusive der klebenden Spalten, weil die
+   Heat-Flaechen gegen dieselbe geerbte Variable mischen. */
+.budget-matrix__group .budget-matrix__row:hover,
+.budget-matrix__group .budget-matrix__row:focus-within {
+  --matrix-cell-surface: color-mix(in srgb, var(--color-text-primary) 7%, var(--color-surface));
+}
+
+.budget-matrix__label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: var(--matrix-label-width);
+  min-width: var(--matrix-label-width);
+  max-width: var(--matrix-label-width);
+  padding: 4px var(--space-3);
+  border-right: 1px solid var(--color-border);
+  background-color: var(--matrix-cell-surface);
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+
+.budget-matrix__label--head {
+  border-right: 1px solid var(--color-border);
+}
+
+.budget-matrix__category {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.budget-matrix__label .status-badge {
+  margin-left: var(--space-2);
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+/* --- Gruppenzeile ---------------------------------------------------------- */
+
+.budget-matrix__row--group {
+  --matrix-cell-surface: color-mix(in srgb, var(--color-text-primary) 5%, var(--color-surface));
+  font-weight: 600;
+}
+
+.budget-matrix__row--group > th,
+.budget-matrix__row--group > td {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.budget-matrix__group-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Nach innen versetzt, weil die klebende Beschriftungsspalte overflow:hidden
+   traegt - ein aeusserer Ring wuerde abgeschnitten. */
+.budget-matrix__group-toggle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.budget-matrix__caret {
+  flex: none;
+  width: 10px;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+}
+
+.budget-matrix__group-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.budget-matrix__group-count {
+  margin-left: auto;
+  padding-left: var(--space-2);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+/* --- Monatszellen und Heatmap --------------------------------------------- */
+
+.budget-matrix__cell {
+  width: var(--matrix-month-width);
+  min-width: var(--matrix-month-width);
+  padding: 0;
+  background-color: color-mix(
+    in srgb,
+    var(--matrix-heat-hue) var(--matrix-heat-alpha),
+    var(--matrix-cell-surface)
+  );
+}
+
+.budget-matrix__value {
+  display: block;
+  width: 100%;
+  padding: 4px var(--space-2);
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  /* Tabellenspalte, keine Schlagzahl: gleiche Ziffernbreite haelt die
+     Nachkommalosen Betraege exakt untereinander. */
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.budget-matrix__value--action {
+  cursor: pointer;
+}
+
+.budget-matrix__value--action:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.budget-matrix__value--static {
+  cursor: default;
+}
+
+/* Leere Zellen sollen ruhig bleiben - der Gedankenstrich darf die Zeile nicht
+   optisch fuellen. */
+.budget-matrix__cell[data-heat="0"] .budget-matrix__value {
+  color: var(--color-text-secondary);
+}
+
+.budget-matrix__cell[data-future="true"] .budget-matrix__value {
+  color: var(--color-text-secondary);
+}
+
+/*
+ * Farbrollen. Warm = Ausgabe/ueber Plan, kuehl-gruen = Einnahme/unter Plan.
+ * Der Abweichungsmodus ist damit divergierend: zwei Gegenpole und ein
+ * neutraler Nullpunkt (Heatstufe 0 = reine Zellflaeche, kein Farbstich).
+ */
+.budget-matrix__cell[data-tone="expense"],
+.budget-matrix__cell[data-tone="adverse"],
+.budget-matrix__swatch[data-tone="expense"],
+.budget-matrix__swatch[data-tone="adverse"] {
+  --matrix-heat-hue: var(--color-warning);
+}
+
+.budget-matrix__cell[data-tone="income"],
+.budget-matrix__cell[data-tone="favorable"],
+.budget-matrix__swatch[data-tone="income"],
+.budget-matrix__swatch[data-tone="favorable"] {
+  --matrix-heat-hue: var(--color-positive);
+}
+
+.budget-matrix__cell[data-tone="neutral"],
+.budget-matrix__swatch[data-tone="neutral"] {
+  --matrix-heat-hue: var(--color-text-secondary);
+}
+
+/*
+ * Fuenf Stufen, Deckkraft-OBERGRENZE 34 %. Die Grenze ist gemessen, nicht
+ * geschaetzt: bei 34 % betraegt der WCAG-Kontrast von Zellschrift zu
+ * Zellflaeche
+ *   hell   #161614 auf Warnton  12,1:1   auf Positivton 10,7:1
+ *   dunkel #ededec auf Warnton   7,3:1   auf Positivton  8,5:1
+ * also in jedem Modus und auf beiden Farbrollen ueber 7:1 (AAA). Wer die
+ * Stufen hochzieht, kippt zuerst den dunklen Modus - dort ist der Abstand am
+ * kleinsten.
+ */
+.budget-matrix__cell[data-heat="1"],
+.budget-matrix__swatch[data-heat="1"] {
+  --matrix-heat-alpha: 7%;
+}
+
+.budget-matrix__cell[data-heat="2"],
+.budget-matrix__swatch[data-heat="2"] {
+  --matrix-heat-alpha: 13%;
+}
+
+.budget-matrix__cell[data-heat="3"],
+.budget-matrix__swatch[data-heat="3"] {
+  --matrix-heat-alpha: 20%;
+}
+
+.budget-matrix__cell[data-heat="4"],
+.budget-matrix__swatch[data-heat="4"] {
+  --matrix-heat-alpha: 27%;
+}
+
+.budget-matrix__cell[data-heat="5"],
+.budget-matrix__swatch[data-heat="5"] {
+  --matrix-heat-alpha: 34%;
+}
+
+/* Laufender Monat: eine schmale Fuehrungslinie links und rechts durch die
+   ganze Spalte, statt einer zweiten Flaechenfarbe - die ist fuer die Heatmap
+   reserviert. */
+.budget-matrix__cell[data-current="true"] {
+  box-shadow:
+    inset 1px 0 0 color-mix(in srgb, var(--color-highlight) 65%, transparent),
+    inset -1px 0 0 color-mix(in srgb, var(--color-highlight) 65%, transparent);
+}
+
+/* --- Verlauf und Gesamt (rechts klebend) ---------------------------------- */
+
+.budget-matrix__trend {
+  position: sticky;
+  right: var(--matrix-total-width);
+  z-index: 2;
+  width: var(--matrix-trend-width);
+  min-width: var(--matrix-trend-width);
+  padding: 2px var(--space-2);
+  background-color: var(--matrix-cell-surface);
+  box-shadow: -1px 0 0 var(--color-border);
+  text-align: right;
+  vertical-align: middle;
+}
+
+.budget-matrix__total {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  width: var(--matrix-total-width);
+  min-width: var(--matrix-total-width);
+  padding: 4px var(--space-3);
+  background-color: var(--matrix-cell-surface);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+
+.budget-matrix__total--head {
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.budget-matrix__spark {
+  display: block;
+  margin-left: auto;
+}
+
+.budget-matrix__spark rect {
+  fill: color-mix(in srgb, var(--color-text-secondary) 55%, transparent);
+}
+
+.budget-matrix__spark rect[data-tone="expense"],
+.budget-matrix__spark rect[data-tone="adverse"] {
+  fill: color-mix(in srgb, var(--color-warning) 55%, transparent);
+}
+
+.budget-matrix__spark rect[data-tone="income"],
+.budget-matrix__spark rect[data-tone="favorable"] {
+  fill: color-mix(in srgb, var(--color-positive) 55%, transparent);
+}
+
+/* Der laufende Monat ist der Akzent der Sparkline - alle anderen Balken sind
+   bewusst zurueckgenommen. */
+.budget-matrix__spark rect[data-current="true"] {
+  fill: var(--color-highlight);
+}
+
+.budget-matrix__spark-zero {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+/* --- Fusszeile ------------------------------------------------------------- */
+
+.budget-matrix__table tfoot th,
+.budget-matrix__table tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  background-color: var(--color-surface-raised);
+}
+
+.budget-matrix__table tfoot .budget-matrix__label,
+.budget-matrix__table tfoot .budget-matrix__trend,
+.budget-matrix__table tfoot .budget-matrix__total {
+  z-index: 6;
+}
+
+.budget-matrix__row--footer > th,
+.budget-matrix__row--footer > td {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
+  font-weight: 600;
+}
+
+.budget-matrix__row--footer .budget-matrix__label {
+  font-size: 11px;
+}
+
+/* Die Saldozeile ist das Ergebnis der ganzen Tabelle und traegt als einzige
+   eine Vorzeichenfarbe. */
+.budget-matrix__row--balance > th,
+.budget-matrix__row--balance > td {
+  border-top: 2px solid var(--color-border);
+}
+
+.budget-matrix__cell--footer {
+  background-color: var(--color-surface-raised);
+}
+
+.budget-matrix__cell--footer .budget-matrix__value,
+.budget-matrix__row--footer .budget-matrix__total {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* --- Schmale Fenster ------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .budget-matrix {
+    --matrix-label-width: 160px;
+    --matrix-trend-width: 0px;
+    --matrix-total-width: 84px;
+  }
+
+  /* Auf schmalen Fenstern kostet die Sparkline mehr Platz als sie einbringt -
+     die Gesamtspalte bleibt, sie traegt die Zahl. */
+  .budget-matrix__trend {
+    display: none;
+  }
+}

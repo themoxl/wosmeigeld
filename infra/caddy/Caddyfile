@@ -1,0 +1,41 @@
+# Reverse Proxy fuer die Betriebsprofile "Privat/Home-Server" und
+# "Produktiv/SaaS" (Architekturplan Abschnitt 4). Im Development-Profil
+# (docker-compose.dev.yml) wird Caddy nicht gestartet; Web und API sind dort
+# direkt ueber ihre Ports erreichbar.
+
+{$DOMAIN:localhost} {
+	# KI-Feld: NDJSON-Strom eines Laufs (GET /v1/assistant/runs/<id>/stream)
+	# ohne Kompression und ohne Puffer. encode haelt kleine Antworten zurueck,
+	# bis seine Mindestlaenge erreicht ist, und reverse_proxy puffert ohne
+	# flush_interval - der Ping alle 10 s kaeme nicht an, und der Client gaebe
+	# die Verbindung nach 35 s Stille auf. Der Pfad mit Platzhalter in der Mitte
+	# ist laenger als /v1/* und wird deshalb vor dem allgemeinen Block geprueft.
+	@not_assistant_stream not path /v1/assistant/runs/*/stream
+
+	handle /v1/assistant/runs/*/stream {
+		reverse_proxy api:8000 {
+			flush_interval -1
+		}
+	}
+
+	encode @not_assistant_stream zstd gzip
+
+	handle /v1/* {
+		reverse_proxy api:8000
+	}
+
+	handle /health {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy web:80
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}

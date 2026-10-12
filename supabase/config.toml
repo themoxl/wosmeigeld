@@ -1,0 +1,41 @@
+# Supabase lokal via `supabase start` (Supabase CLI). Wendet migrations/ und
+# seed/ an. Ports bewusst abweichend von anderen lokalen Supabase-Projekten
+# (z. B. anderer lokaler Projekte) gewaehlt, damit beide gleichzeitig laufen koennen.
+project_id = "finanzplaner"
+
+[api]
+enabled = true
+port = 55321
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 55322
+shadow_port = 55320
+major_version = 15
+
+[studio]
+enabled = true
+port = 55323
+
+[inbucket]
+enabled = true
+port = 55324
+
+[analytics]
+enabled = false
+
+[storage]
+enabled = true
+file_size_limit = "25MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173", "exp://localhost:8081"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_confirmations = false

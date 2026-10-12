@@ -1,0 +1,20 @@
+{
+  "name": "@finanzplaner/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Geteilte TypeScript-Typen fuer Web und Mobile, inkl. aus der OpenAPI-Spezifikation der API generierter Typen (siehe README.md).",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate": "node scripts/generate-api-types.mjs"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.7.3"
+  }
+}

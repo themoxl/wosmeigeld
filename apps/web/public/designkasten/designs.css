@@ -1,0 +1,143 @@
+/* Designkasten-Stand a6db8b45920d · Quelle: sia_public/designkasten · hier nicht aendern, sondern dort und dann node designkasten/verteilen.js */
+/* Designkasten · designs.css — Grundfarben der Kasten-Designs und Stil des Designfensters.
+   ERZEUGT von designkasten/bauen.js aus SIA (src/theme.css, src/index.html). Nicht von Hand aendern:
+   in SIA aendern, dann node designkasten/bauen.js und node designkasten/verteilen.js.
+   Programme lesen nur die Rollen --d-*; ihre Bruecke uebersetzt sie auf die eigenen Farbnamen. */
+
+:root[data-design="warm"] {
+  color-scheme: dark;
+  --d-bg:#1c1512; --d-panel:#2b211b; --d-panel2:#211915; --d-line:#4a382c;
+  --d-line-stark:#6f5e52; --d-fg:#f0e4d8; --d-fg2:#c7b5a5; --d-muted:#a99584;
+  --d-faint:#8a7f74; --d-akzent:#e0876d; --d-akzent2:#c9913a; --d-akzent-hell:#f0a184;
+  --d-akzent-tief:#8f4f3f; --d-auf-akzent:#24140f; --d-auf-akzent2:#1c1309; --d-auf-akzent-tief:#f8eee5;
+  --d-akzent-flaeche:rgba(224,135,109,.15); --d-hl:rgba(224,135,109,.14); --d-ok:#86a98c; --d-warn:#c9913a;
+  --d-bad:#d16f52; --d-info:#7e9a98; --d-auf-status:#24140f; --d-ok-stark:#9fb877;
+  --d-bad-stark:#e08a6a; --d-ok-flaeche:rgba(134,169,140,.15); --d-bad-flaeche:rgba(209,111,82,.15); --d-warn-flaeche:rgba(201,145,58,0.15);
+  --d-info-flaeche:rgba(126,154,152,0.15); --d-stufe-krit:#d16f52; --d-stufe-hoch:#d98a4f; --d-stufe-mittel:#c9913a;
+  --d-stufe-niedrig:#86a98c; --d-overlay:rgba(9,6,4,.58); --d-schatten:0 18px 52px rgba(0,0,0,.45); --d-code:#14100c;
+  --d-code-text:#e3d5be; --d-achse:#948577; --d-gitter:rgba(200,175,140,.13); --d-cat-a:#b98a5a;
+  --d-cat-b:#a9705c; --d-cat-c:#8c9a6a; --d-cat-d:#b4936c; --d-cat-e:#94806e;
+  --d-cat-f:#a87c8c; --d-cat-g:#7e9a98; --d-heat-0:#7c7167; --d-heat-1:#7e9a98;
+  --d-heat-2:#8fa269; --d-heat-3:#d9a54e; --d-heat-4:#d0763f; --d-heat-5:#c4553e;
+  --d-kopf:#2a201a; --d-kopf-flaeche:#2a201a; --d-kopf-text:#f0e4d8; --d-kopf-linie:#4a382c;
+  --d-rand-aktiv:#e0876d; --d-grund:none;
+}
+:root[data-design="ember"] {
+  color-scheme: dark;
+  --d-bg:#150f0d; --d-panel:#1f1613; --d-panel2:#291d18; --d-line:#3b2b23;
+  --d-line-stark:#63544a; --d-fg:#f3e7d3; --d-fg2:#d3bfa9; --d-muted:#9c8674;
+  --d-faint:#8a7f74; --d-akzent:#bd7263; --d-akzent2:#c99c56; --d-akzent-hell:#d29f95;
+  --d-akzent-tief:#7f3f34; --d-auf-akzent:#fbefe4; --d-auf-akzent2:#1c1309; --d-auf-akzent-tief:#f6e8d8;
+  --d-akzent-flaeche:rgba(189,114,99,.15); --d-hl:rgba(189,114,99,.16); --d-ok:#8aa268; --d-warn:#d9a54e;
+  --d-bad:#c4553e; --d-info:#7e9a98; --d-auf-status:#fdf6ea; --d-ok-stark:#9fb877;
+  --d-bad-stark:#e08a6a; --d-ok-flaeche:rgba(138,162,104,.15); --d-bad-flaeche:rgba(196,85,62,.15); --d-warn-flaeche:rgba(217,165,78,0.15);
+  --d-info-flaeche:rgba(126,154,152,0.15); --d-stufe-krit:#c4553e; --d-stufe-hoch:#d07c43; --d-stufe-mittel:#d9a54e;
+  --d-stufe-niedrig:#8aa268; --d-overlay:rgba(10,6,4,.45); --d-schatten:0 10px 30px rgba(0,0,0,.55); --d-code:#14100c;
+  --d-code-text:#e3d5be; --d-achse:#948577; --d-gitter:rgba(200,175,140,.13); --d-cat-a:#b98a5a;
+  --d-cat-b:#a9705c; --d-cat-c:#8c9a6a; --d-cat-d:#b4936c; --d-cat-e:#94806e;
+  --d-cat-f:#a87c8c; --d-cat-g:#7e9a98; --d-heat-0:#7c7167; --d-heat-1:#7e9a98;
+  --d-heat-2:#8fa269; --d-heat-3:#d9a54e; --d-heat-4:#d0763f; --d-heat-5:#c4553e;
+  --d-kopf:#1e1613; --d-kopf-flaeche:#1e1613; --d-kopf-text:#f3e7d3; --d-kopf-linie:#3b2b23;
+  --d-rand-aktiv:#bd7263; --d-grund:none;
+}
+:root[data-design="dark"] {
+  color-scheme: dark;
+  --d-bg:#17211f; --d-panel:#1e2a27; --d-panel2:#243330; --d-line:#33423d;
+  --d-line-stark:#5c655d; --d-fg:#ece3d0; --d-fg2:#c9d3c4; --d-muted:#9aa89b;
+  --d-faint:#888888; --d-akzent:#8faa6f; --d-akzent2:#e0b354; --d-akzent-hell:#b3c59d;
+  --d-akzent-tief:#8faa6f; --d-auf-akzent:#0e1b12; --d-auf-akzent2:#141310; --d-auf-akzent-tief:#0e1b12;
+  --d-akzent-flaeche:rgba(143,170,111,.15); --d-hl:rgba(143,170,111,.16); --d-ok:#8faa6f; --d-warn:#e0b354;
+  --d-bad:#c97b5a; --d-info:#7fa0b3; --d-auf-status:#fff; --d-ok-stark:#3a6b2e;
+  --d-bad-stark:#9c3b1e; --d-ok-flaeche:rgba(143,170,111,.15); --d-bad-flaeche:rgba(201,123,90,.15); --d-warn-flaeche:rgba(224,179,84,0.15);
+  --d-info-flaeche:rgba(127,160,179,0.15); --d-stufe-krit:#c97b5a; --d-stufe-hoch:#d38a4f; --d-stufe-mittel:#e0b354;
+  --d-stufe-niedrig:#8faa6f; --d-overlay:rgba(0,0,0,.35); --d-schatten:0 10px 30px rgba(0,0,0,.4); --d-code:#0d1117;
+  --d-code-text:#c9d1d9; --d-achse:#8a8f88; --d-gitter:rgba(140,140,140,.18); --d-cat-a:#7fa0b3;
+  --d-cat-b:#9d7f68; --d-cat-c:#748aa0; --d-cat-d:#6f8f86; --d-cat-e:#7e9068;
+  --d-cat-f:#9a7583; --d-cat-g:#6f8393; --d-heat-0:#95a5a6; --d-heat-1:#3498db;
+  --d-heat-2:#2ecc71; --d-heat-3:#f1c40f; --d-heat-4:#e67e22; --d-heat-5:#e74c3c;
+  --d-kopf:#1e2927; --d-kopf-flaeche:#1e2927; --d-kopf-text:#ece3d0; --d-kopf-linie:#33423d;
+  --d-rand-aktiv:#8faa6f; --d-grund:none;
+}
+:root[data-design="daemmerung"] {
+  color-scheme: dark;
+  --d-bg:#17141c; --d-panel:#231e2b; --d-panel2:#1c1823; --d-line:#3b3248;
+  --d-line-stark:#635a6d; --d-fg:#efe7ef; --d-fg2:#c9bdcc; --d-muted:#a395ab;
+  --d-faint:#8b8094; --d-akzent:#ff9565; --d-akzent2:#b89cff; --d-akzent-hell:#ffb391;
+  --d-akzent-tief:#5b4590; --d-auf-akzent:#2a1208; --d-auf-akzent2:#1a1030; --d-auf-akzent-tief:#f6f0ff;
+  --d-akzent-flaeche:rgba(255,149,101,.15); --d-hl:rgba(184,156,255,.13); --d-ok:#8cc5a0; --d-warn:#e9b15c;
+  --d-bad:#f07b6b; --d-info:#8fa6d9; --d-auf-status:#1a1222; --d-ok-stark:#a3d4b2;
+  --d-bad-stark:#f59585; --d-ok-flaeche:rgba(140,197,160,.15); --d-bad-flaeche:rgba(240,123,107,.15); --d-warn-flaeche:rgba(233,177,92,0.15);
+  --d-info-flaeche:rgba(143,166,217,0.15); --d-stufe-krit:#f07b6b; --d-stufe-hoch:#f59a62; --d-stufe-mittel:#e9b15c;
+  --d-stufe-niedrig:#8cc5a0; --d-overlay:rgba(8,5,14,.6); --d-schatten:0 18px 52px rgba(4,2,10,.55); --d-code:#120f16;
+  --d-code-text:#e6dcea; --d-achse:#9a8fa6; --d-gitter:rgba(190,170,220,.12); --d-cat-a:#a58fd8;
+  --d-cat-b:#e0906c; --d-cat-c:#6fb0ad; --d-cat-d:#d07a9a; --d-cat-e:#c9a66b;
+  --d-cat-f:#7f97cf; --d-cat-g:#93ad84; --d-heat-0:#6f6878; --d-heat-1:#7f97cf;
+  --d-heat-2:#a58fd8; --d-heat-3:#e9b15c; --d-heat-4:#f08a5d; --d-heat-5:#e0605a;
+  --d-kopf:linear-gradient(90deg,#322b44 0%,#312a43 40%,#3c2935 70%,#482322 100%); --d-kopf-flaeche:#322b44; --d-kopf-text:#efe7ef; --d-kopf-linie:rgba(239,231,239,.08);
+  --d-rand-aktiv:linear-gradient(90deg,#b89cff,#ff9565); --d-grund:radial-gradient(1100px 520px at 0% 0%,rgba(90,70,150,.10),transparent 62%), radial-gradient(1000px 520px at 100% 0%,rgba(160,60,50,.08),transparent 62%);
+}
+:root[data-design="oled"] {
+  color-scheme: dark;
+  --d-bg:#000000; --d-panel:#0b0a0f; --d-panel2:#060509; --d-line:#26222f;
+  --d-line-stark:#53505b; --d-fg:#f3f1f7; --d-fg2:#c8c3d2; --d-muted:#918b9e;
+  --d-faint:#76708a; --d-akzent:#a78bfa; --d-akzent2:#ff9565; --d-akzent-hell:#c4b1ff;
+  --d-akzent-tief:#4c2f8f; --d-auf-akzent:#120a24; --d-auf-akzent2:#2a1208; --d-auf-akzent-tief:#f4efff;
+  --d-akzent-flaeche:rgba(167,139,250,.16); --d-hl:rgba(167,139,250,.14); --d-ok:#5fd49a; --d-warn:#f2b84b;
+  --d-bad:#ff6b7a; --d-info:#7aa7ff; --d-auf-status:#0b0a0f; --d-ok-stark:#7fe0ae;
+  --d-bad-stark:#ff8a96; --d-ok-flaeche:rgba(95,212,154,.14); --d-bad-flaeche:rgba(255,107,122,.14); --d-warn-flaeche:rgba(242,184,75,0.15);
+  --d-info-flaeche:rgba(122,167,255,0.15); --d-stufe-krit:#ff6b7a; --d-stufe-hoch:#ff8f5e; --d-stufe-mittel:#f2b84b;
+  --d-stufe-niedrig:#5fd49a; --d-overlay:rgba(0,0,0,.72); --d-schatten:0 18px 52px rgba(0,0,0,.8); --d-code:#050407;
+  --d-code-text:#e4dff0; --d-achse:#8a8597; --d-gitter:rgba(167,139,250,.10); --d-cat-a:#a78bfa;
+  --d-cat-b:#ff9565; --d-cat-c:#5fd4c4; --d-cat-d:#f07ab8; --d-cat-e:#e9c46a;
+  --d-cat-f:#7aa7ff; --d-cat-g:#9bd88a; --d-heat-0:#4a4556; --d-heat-1:#7aa7ff;
+  --d-heat-2:#a78bfa; --d-heat-3:#f2b84b; --d-heat-4:#ff8f5e; --d-heat-5:#ff5c6c;
+  --d-kopf:linear-gradient(90deg,rgba(167,139,250,.6),rgba(255,149,101,.6)) bottom/100% 1px no-repeat,#000; --d-kopf-flaeche:#000000; --d-kopf-text:#f3f1f7; --d-kopf-linie:transparent;
+  --d-rand-aktiv:linear-gradient(90deg,#b89cff,#ff9565); --d-grund:none;
+}
+:root[data-design="light"] {
+  color-scheme: light;
+  --d-bg:#f3eee1; --d-panel:#faf6ec; --d-panel2:#efe8d6; --d-line:#d9cfb8;
+  --d-line-stark:#b4ae9b; --d-fg:#2f3a33; --d-fg2:#4a564b; --d-muted:#6b7a6a;
+  --d-faint:#888888; --d-akzent:#5a7d4f; --d-akzent2:#cf9a3a; --d-akzent-hell:#5a7d4f;
+  --d-akzent-tief:#5a7d4f; --d-auf-akzent:#ffffff; --d-auf-akzent2:#141310; --d-auf-akzent-tief:#ffffff;
+  --d-akzent-flaeche:rgba(143,170,111,.15); --d-hl:rgba(90,125,79,.14); --d-ok:#5a7d4f; --d-warn:#cf9a3a;
+  --d-bad:#b45f43; --d-info:#5c7f92; --d-auf-status:#fff; --d-ok-stark:#3a6b2e;
+  --d-bad-stark:#9c3b1e; --d-ok-flaeche:rgba(143,170,111,.15); --d-bad-flaeche:rgba(201,123,90,.15); --d-warn-flaeche:rgba(207,154,58,0.15);
+  --d-info-flaeche:rgba(92,127,146,0.15); --d-stufe-krit:#b45f43; --d-stufe-hoch:#c07a37; --d-stufe-mittel:#cf9a3a;
+  --d-stufe-niedrig:#5a7d4f; --d-overlay:rgba(0,0,0,.35); --d-schatten:0 10px 30px rgba(0,0,0,.14); --d-code:#0d1117;
+  --d-code-text:#c9d1d9; --d-achse:#8a8f88; --d-gitter:rgba(140,140,140,.18); --d-cat-a:#7fa0b3;
+  --d-cat-b:#9d7f68; --d-cat-c:#748aa0; --d-cat-d:#6f8f86; --d-cat-e:#7e9068;
+  --d-cat-f:#9a7583; --d-cat-g:#6f8393; --d-heat-0:#95a5a6; --d-heat-1:#3498db;
+  --d-heat-2:#2ecc71; --d-heat-3:#f1c40f; --d-heat-4:#e67e22; --d-heat-5:#e74c3c;
+  --d-kopf:#faf6eb; --d-kopf-flaeche:#faf6eb; --d-kopf-text:#2f3a33; --d-kopf-linie:#d9cfb8;
+  --d-rand-aktiv:#5a7d4f; --d-grund:none;
+}
+
+/* ---------- Designfenster (designwahl.js) ----------
+   Nachbau von SIAs .sia-designwahl. Nutzt NUR die Fensterrollen (Designkasten.fensterrollen):
+   --d-panel --d-panel2 --d-line --d-fg --d-fg2 --d-muted --d-hl --d-akzent --d-warn --d-schatten.
+   Kasten-Designs setzen sie selbst; fuer eigene Designs setzt sie die Bruecke des Programms. */
+.dk-wahl { position:fixed; z-index:10070; width:288px; max-width:calc(100vw - 16px); max-height:calc(100vh - 16px); overflow:auto; padding:6px; border:1px solid var(--d-line); border-radius:10px; background:var(--d-panel); box-shadow:var(--d-schatten); color:var(--d-fg); font:12px/1.35 -apple-system,"Segoe UI",system-ui,sans-serif; text-align:left; }
+.dk-wahl[hidden] { display:none; }
+.dk-wahl.dk-eingebettet { position:static; z-index:auto; width:auto; max-width:none; max-height:none; overflow:visible; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; }
+.dk-kopf { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:6px 8px 8px; margin-bottom:4px; border-bottom:1px solid var(--d-line); }
+.dk-kopf span { font-size:12.5px; font-weight:700; }
+.dk-kopf small { color:var(--d-muted); font:10px/1 ui-monospace,Consolas,monospace; }
+.dk-meldung { margin:2px 4px 6px; padding:6px 8px; border-left:3px solid var(--d-warn); border-radius:0 6px 6px 0; background:var(--d-panel2); color:var(--d-fg2); font-size:11.5px; }
+.dk-gruppe { padding:8px 8px 4px; color:var(--d-muted); font:700 9px/1 ui-monospace,Consolas,monospace; letter-spacing:.14em; text-transform:uppercase; }
+.dk-item { display:flex; width:100%; align-items:center; gap:11px; margin:0; padding:7px 8px; border:0; border-radius:7px; background:transparent; color:var(--d-fg2); font:inherit; text-align:left; cursor:pointer; }
+.dk-item:hover { background:var(--d-hl); color:var(--d-fg); }
+.dk-item:focus-visible { outline:2px solid var(--d-akzent); outline-offset:-2px; }
+.dk-item[aria-checked="true"] { background:color-mix(in srgb,var(--d-hl) 80%,transparent); color:var(--d-fg); }
+.dk-probe { position:relative; flex:none; width:46px; height:30px; overflow:hidden; border:1px solid rgba(128,128,128,.35); border-radius:5px; }
+.dk-probe i { position:absolute; display:block; }
+.dk-probe .dk-p-kopf { top:0; right:0; left:0; height:8px; }
+.dk-probe .dk-p-feld { top:12px; left:5px; width:22px; height:13px; border-radius:2px; }
+.dk-probe .dk-p-a { top:13px; right:6px; width:7px; height:7px; border-radius:50%; }
+.dk-probe .dk-p-b { top:18px; right:15px; width:5px; height:5px; border-radius:50%; }
+.dk-text { display:grid; flex:1; min-width:0; gap:2px; }
+.dk-text b { display:flex; align-items:center; gap:6px; color:inherit; font-size:12.5px; font-weight:650; }
+.dk-text b em { padding:2px 5px; border-radius:4px; background:var(--d-panel2); color:var(--d-muted); font:600 9px/1.2 ui-monospace,Consolas,monospace; font-style:normal; letter-spacing:.08em; text-transform:uppercase; }
+.dk-text small { overflow:hidden; color:var(--d-muted); font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.dk-haken { flex:none; width:16px; color:var(--d-akzent); font-weight:700; visibility:hidden; }
+.dk-item[aria-checked="true"] .dk-haken { visibility:visible; }

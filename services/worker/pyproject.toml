@@ -1,0 +1,23 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+# Der Worker importiert den KI-Kern (app/llm) und weitere Motoren aus
+# services/api; ohne diesen Pfad waeren sie fuer mypy "Any" und jede
+# Feldverwechslung bliebe stumm.
+mypy_path = "$MYPY_CONFIG_FILE_DIR/../api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+# services/api (app.*, u. a. der KI-Kern app/llm) wie im Container ueber den
+# Importpfad statt ueber sys.path-Kniffe in den Modulen (siehe Dockerfile).
+pythonpath = [".", "../api"]

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="de" class="theme-carbon">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finanzplaner — Bespoke Non-AI Palette & Architecture Showcase</title>
+  <style>
+    /* ============================================================================
+       Bespoke Non-AI Color Palettes (Inspired by Akasha, Swiss Banking & Mineral Tones)
+       ============================================================================ */
+
+    /* Palette 1: Akasha Carbon & Aged Gold (Default) */
+    html.theme-carbon {
+      --bg-app: #121214;
+      --bg-surface: #1b1b1e;
+      --bg-surface-elevated: #232326;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-color-strong: rgba(255, 255, 255, 0.16);
+
+      --text-primary: #ededec;
+      --text-secondary: #a0a09b;
+      --text-muted: #6b6b66;
+
+      --accent-primary: #c9a34e; /* Aged Gold */
+      --accent-primary-glow: rgba(201, 163, 78, 0.15);
+      --accent-positive: #1f6d4c; /* Forest Green */
+      --accent-positive-light: #5c9c7c;
+      --accent-positive-glow: rgba(31, 109, 76, 0.18);
+      --accent-warning: #e8604c; /* Coral Red */
+      --accent-warning-glow: rgba(232, 96, 76, 0.15);
+      --accent-amber: #d97706;
+
+      --font-mono: "Cascadia Code", "SF Mono", "Consolas", monospace;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* Palette 2: Nordic Charcoal & Alpine Mint */
+    html.theme-nordic {
+      --bg-app: #0e1317;
+      --bg-surface: #151c21;
+      --bg-surface-elevated: #1f272e;
+      --border-color: rgba(255, 255, 255, 0.09);
+      --border-color-strong: rgba(255, 255, 255, 0.18);
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent-primary: #2dd4bf; /* Alpine Mint Teal */
+      --accent-primary-glow: rgba(45, 212, 191, 0.15);
+      --accent-positive: #10b981;
+      --accent-positive-light: #34d399;
+      --accent-positive-glow: rgba(16, 185, 129, 0.18);
+      --accent-warning: #f59e0b;
+      --accent-warning-glow: rgba(245, 158, 11, 0.15);
+
+      --font-mono: "Cascadia Code", "SF Mono", monospace;
+      --font-sans: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Palette 3: Obsidian Pitch & Raw Copper */
+    html.theme-obsidian {
+      --bg-app: #0a0a0a;
+      --bg-surface: #141414;
+      --bg-surface-elevated: #1f1f1f;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-color-strong: rgba(255, 255, 255, 0.18);
+
+      --text-primary: #f4f1de; /* Soft Linen */
+      --text-secondary: #a09d94;
+      --text-muted: #686660;
+
+      --accent-primary: #e07a5f; /* Raw Copper */
+      --accent-primary-glow: rgba(224, 122, 95, 0.15);
+      --accent-positive: #81b29a; /* Sage Eucalyptus */
+      --accent-positive-light: #a8d5ba;
+      --accent-positive-glow: rgba(129, 178, 154, 0.18);
+      --accent-warning: #f2cc8f;
+      --accent-warning-glow: rgba(242, 204, 143, 0.15);
+
+      --font-mono: "Cascadia Code", monospace;
+      --font-sans: system-ui, sans-serif;
+    }
+
+    /* Palette 4: Papyrus Ivory (Light Mode) */
+    html.theme-papyrus {
+      --bg-app: #f7efe0;
+      --bg-surface: #efe3cf;
+      --bg-surface-elevated: #e7d8bf;
+      --border-color: rgba(36, 28, 24, 0.12);
+      --border-color-strong: rgba(36, 28, 24, 0.22);
+
+      --text-primary: #241c18; /* Carbon Ink */
+      --text-secondary: #5c4a3e;
+      --text-muted: #8a7563;
+
+      --accent-primary: #783b32; /* Deep Hematite */
+      --accent-primary-glow: rgba(120, 59, 50, 0.12);
+      --accent-positive: #5a7d4f; /* Mineral Olive */
+      --accent-positive-light: #709a63;
+      --accent-positive-glow: rgba(90, 125, 79, 0.15);
+      --accent-warning: #b06a2c;
+      --accent-warning-glow: rgba(176, 106, 44, 0.15);
+
+      --font-mono: "Cascadia Code", monospace;
+      --font-sans: system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Showcase Bar */
+    .showcase-bar {
+      background: #08090c;
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .showcase-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #f1f5f9;
+    }
+
+    .showcase-title .badge {
+      background: rgba(201, 163, 78, 0.15);
+      border: 1px solid #c9a34e;
+      color: #c9a34e;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .palette-switchers {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      gap: 3px;
+    }
+
+    .palette-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .palette-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .palette-btn.active {
+      background: var(--accent-primary);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Main Container */
+    .app-shell {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar C1: Technical Workstation */
+    .sidebar-c1 {
+      width: 270px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .c1-brand-area {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .c1-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .c1-logo-text {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .c1-brand-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--accent-primary-glow);
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+    }
+
+    .c1-household-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .c1-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--accent-positive), var(--accent-primary));
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .c1-search-box {
+      margin: 12px 16px 8px;
+      position: relative;
+    }
+
+    .c1-search-input {
+      width: 100%;
+      background: var(--bg-app);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 7px 30px 7px 10px;
+      font-size: 12px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .c1-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .c1-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .c1-group-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .c1-group-code {
+      color: var(--accent-primary);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .c1-group-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .c1-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+    }
+
+    .c1-link-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .c1-link-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+
+    .c1-link:hover {
+      background: var(--bg-surface-elevated);
+      color: var(--text-primary);
+    }
+
+    .c1-link.active {
+      background: var(--accent-positive-glow);
+      color: var(--text-primary);
+      font-weight: 600;
+      border-left-color: var(--accent-positive);
+    }
+
+    .c1-link.active .c1-link-icon {
+      opacity: 1;
+      color: var(--accent-positive-light);
+    }
+
+    .c1-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .c1-badge-warn {
+      background: var(--accent-warning-glow);
+      color: var(--accent-warning);
+      border: 1px solid var(--accent-warning);
+    }
+
+    .c1-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 12px 16px;
+      background: var(--bg-app);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .c1-telemetry-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .c1-telemetry-label {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
+    .c1-telemetry-val {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .c1-telemetry-val.positive { color: var(--accent-positive-light); }
+
+    /* Dashboard View */
+    .main-view {
+      flex: 1;
+      background: var(--bg-app);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 32px;
+      gap: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .kpi-val {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+
+    .icon {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="showcase-bar">
+    <div class="showcase-title">
+      <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-primary); width:20px; height:20px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Finanzplaner Bespoke Palette Showcase</span>
+      <span class="badge">NO-AI PALETTES</span>
+    </div>
+
+    <div class="palette-switchers">
+      <button class="palette-btn active" onclick="switchTheme('carbon', this)">
+        1. Akasha Carbon & Aged Gold
+      </button>
+      <button class="palette-btn" onclick="switchTheme('nordic', this)">
+        2. Nordic Charcoal & Alpine Mint
+      </button>
+      <button class="palette-btn" onclick="switchTheme('obsidian', this)">
+        3. Obsidian Pitch & Copper
+      </button>
+      <button class="palette-btn" onclick="switchTheme('papyrus', this)">
+        4. Papyrus Ivory (Light)
+      </button>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar-c1">
+      <div class="c1-brand-area">
+        <div class="c1-brand">
+          <span class="c1-logo-text">Finanzplaner</span>
+          <span class="c1-brand-tag">PRO</span>
+        </div>
+
+        <div class="c1-household-card">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="c1-avatar">P</div>
+            <div>
+              <div style="font-size:12px; font-weight:600;">Privathaushalt</div>
+              <div style="font-size:10px; color:var(--text-muted);">2 Mitglieder · EUR</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="c1-search-box">
+        <input type="text" class="c1-search-input" placeholder="Filter...">
+      </div>
+
+      <nav class="c1-nav">
+        <div>
+          <div class="c1-group-header">
+            <span class="c1-group-title">
+              <span class="c1-group-code">01</span> OVERVIEW
+            </span>
+          </div>
+          <ul class="c1-group-items">
+            <li><a href="#" class="c1-link active"><span class="c1-link-left">Übersicht</span></a></li>
+            <li><a href="#" class="c1-link"><span class="c1-link-left">Berichte</span></a></li>
+            <li><a href="#" class="c1-link"><span class="c1-link-left">Empfehlungen</span></a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="c1-group-header">
+            <span class="c1-group-title">
+              <span class="c1-group-code">02</span> GELD
+            </span>
+          </div>
+          <ul class="c1-group-items">
+            <li><a href="#" class="c1-link"><span class="c1-link-left">Alle Buchungen</span></a></li>
+            <li><a href="#" class="c1-link"><span class="c1-link-left">Konten</span></a></li>
+            <li>
+              <a href="#" class="c1-link">
+                <span class="c1-link-left">Review-Inbox</span>
+                <span class="c1-badge c1-badge-warn">12</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="c1-group-header">
+            <span class="c1-group-title">
+              <span class="c1-group-code">03</span> PLANUNG
+            </span>
+          </div>
+          <ul class="c1-group-items">
+            <li><a href="#" class="c1-link"><span class="c1-link-left">Budget</span></a></li>
+            <li><a href="#" class="c1-link"><span class="c1-link-left">Verträge</span></a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="c1-footer">
+        <div class="c1-telemetry-row">
+          <span class="c1-telemetry-label">On-Budget:</span>
+          <span class="c1-telemetry-val positive">14.280,50 €</span>
+        </div>
+        <div class="c1-telemetry-row">
+          <span class="c1-telemetry-label">Off-Budget:</span>
+          <span class="c1-telemetry-val">48.500,00 €</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-view">
+      <h1 style="font-size:22px; font-weight:800;">Finanzübersicht (Bespoke Farbschema)</h1>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+        <div class="kpi-card">
+          <span class="kpi-label">Gesamtvermögen</span>
+          <span class="kpi-val">62.780,50 €</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Flüssig On-Budget</span>
+          <span class="kpi-val" style="color:var(--accent-positive-light);">14.280,50 €</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Review Inbox</span>
+          <span class="kpi-val" style="color:var(--accent-warning);">12 Offen</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function switchTheme(themeName, btn) {
+      document.documentElement.className = 'theme-' + themeName;
+      document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

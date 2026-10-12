@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.08">
+  <BkToCstmrDbtCdtNtfctn>
+    <Ntfctn>
+      <Ntry>
+        <Amt Ccy="EUR">42.50</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <BookgDt><Dt>2026-01-05</Dt></BookgDt>
+        <ValDt><Dt>2026-01-05</Dt></ValDt>
+        <NtryRef>SYNTH-ENTRY-0001</NtryRef>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Cdtr><Pty><Nm>Supermarkt Muster GmbH</Nm></Pty></Cdtr>
+            </RltdPties>
+            <RmtInf><Ustrd>Einkauf Supermarkt Muster GmbH</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+        <AddtlNtryInf>Kartenzahlung</AddtlNtryInf>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">2500.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <BookgDt><Dt>2026-01-06</Dt></BookgDt>
+        <ValDt><Dt>2026-01-06</Dt></ValDt>
+        <NtryRef>SYNTH-ENTRY-0002</NtryRef>
+        <NtryDtls>
+          <TxDtls>
+            <RltdPties>
+              <Dbtr><Pty><Nm>Arbeitgeber Muster AG</Nm></Pty></Dbtr>
+            </RltdPties>
+            <RmtInf><Ustrd>Gehalt Januar 2026</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+        <AddtlNtryInf>Gehaltszahlung</AddtlNtryInf>
+      </Ntry>
+    </Ntfctn>
+  </BkToCstmrDbtCdtNtfctn>
+</Document>

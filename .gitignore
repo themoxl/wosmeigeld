@@ -1,0 +1,144 @@
+# Node / JS
+node_modules/
+# Ablageort der installierten Pakete (virtual-store-dir in .npmrc)
+/.p/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+coverage/
+
+# Web (Vite)
+apps/web/dist/
+
+# Playwright (E2E)
+playwright-report/
+test-results/
+blob-report/
+apps/web/e2e/.auth/
+
+# Mobile (Expo)
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Python
+# Isolierter, lokal erzeugter PKV/PostgreSQL-Testserver (keine App-Daten).
+/tmp/pkv-runtime/
+__pycache__/
+*.pyc
+.venv/
+.venv*/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Env / Secrets
+.env
+.env.*
+# Vorlagen mit ausschliesslich Beispielwerten gehoeren ins Repo.
+!.env*.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Docker
+*.pid
+
+# Backups (Phase 10, siehe infra/backup/README.md)
+infra/backup/out/
+# Nur die verschluesselten Sicherungen selbst: backup.sh legt sie ausnahmslos
+# als `<name>.tar.age` ab. Das fruehere `*.age` verschluckte zusaetzlich
+# infra/backup/Dockerfile.age - und ohne die baut lib.sh das age-Image nicht,
+# also laufen backup.sh/restore.sh/restore_test.sh in einem frischen Klon nicht.
+*.tar.age
+age-identity*.txt
+*.agekey
+secrets/
+# Lokale Datenbankabzuege vor groesseren Umbauten - gehoeren nicht ins Repo
+# (ein einzelner Dump ist hier bereits dreistellig in MB).
+.backups/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Claude-Code-Arbeitsverzeichnis (Worktrees, lokale Einstellungen) - nicht Teil des Projekts
+.claude/
+
+# Lokale Datenbank-Schnappschuesse (scripts/db_snapshot.py). Enthalten echte
+# Haushaltsdaten und gehoeren unter keinen Umstaenden ins Repository.
+/db-snapshots/
+
+# Private Gesundheitsdokumente (lokales Storage-Backend)
+.health-storage/
+
+# --- Bewusst nicht in diesem Repository ------------------------------------
+# Echte Preis- und Angebotsdaten. Das Preismodul liest Excel-Dateien ein; die
+# Dateien selbst sind Nutzdaten und gehoeren nicht in die Versionsverwaltung.
+# Eine Demo-Datei erzeugt `python scripts/generate_preisdaten.py`.
+/Preise.xlsx
+/*.xlsx
+
+# Planungs- und Arbeitsdokumente werden ausserhalb dieses Repositorys
+# gefuehrt. Wer sie hier ablegen will, nimmt diese Zeile heraus - dann aber
+# vorher pruefen, ob echte Betraege oder Namen darin stehen.
+/docs/
+
+# Private Installationskonfiguration und Zugangsdaten.
+/infra/nas/
+/*-SECRETS.txt
+*.pem
+*.keystore
+google-play-service-account.json
+*.dump
+*.db
+*.sqlite
+*.sqlite3
+
+# Schluesselspeicher fuer signierte Android-Builds. Geht der verloren, laesst
+# sich eine installierte App nicht mehr aktualisieren - gehoert in eine
+# Sicherung, aber nicht ins Repository.
+/apps/mobile/release.keystore
+/apps/mobile/keystore.properties
+/apps/mobile/android/
+/apps/mobile/ios/
+
+# Private Einmalskripte und Exporte separat ablegen.
+/private/
+/scripts/private/
+/scripts/import_canonical_grocery_prices.py
+
+# Lokale SQL-Exporte koennen Haushaltskennungen und Nutzdaten enthalten.
+/scripts/zutatenpreise_aus_scrape.sql
+
+# Arbeitsstaende der Maskottchen-Animationen (Lottie-Experimente, Einzelbilder
+# aus der Rendervorschau). Das Maskottchen ist noch nicht eingebaut.
+/lani_*.json
+/lani_lottie_viewer.html
+/generate_lottie.py
+/build_hd_lottie_animations.py
+/frame_*.png
+/gif_frame_*.png
+
+# Belege aus Testdurchlaeufen durch die Oberflaeche: Bildschirmfotos und
+# Videoaufzeichnungen der laufenden App. Sie zeigen den realen Haushalt mit
+# Kontostaenden, Vertraegen und Betraegen - Bilddaten, die keine Textsuche
+# nach Personendaten je finden wuerde.
+/dogfood-output/

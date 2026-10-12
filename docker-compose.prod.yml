@@ -1,0 +1,69 @@
+# Haertungs-Ueberlagerung fuer das Betriebsprofil "Produktiv/SaaS"
+# (Architekturplan Abschnitt 4), analog zu docker-compose.dev.yml fuer die
+# Entwicklung:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Aendert nur Dinge, die zusaetzliche Pflichteingaben brauchen (ACME_EMAIL,
+# gemountete Secret-Dateien) und deshalb NICHT in der Basisdatei stehen
+# duerfen - "Privat/Home-Server"-Nutzer starten weiterhin einfach
+# `docker compose up` ohne diese Datei. Siehe docs/BETRIEB.md.
+#
+# Secrets: einmalig `secrets/` anlegen (siehe .gitignore - wird nie
+# committet), je eine Datei pro Secret, Dateiname = Feldname, kein
+# abschliessender Zeilenumbruch:
+#   secrets/supabase_service_role_key
+#   secrets/supabase_jwt_secret
+#   secrets/s3_secret_key
+# services/api/app/core/config.py und services/worker/worker/config.py lesen
+# diese ueber pydantic-settings' secrets_dir (Vorrang vor .env/env_file) -
+# .env kann fuer alle anderen (nicht-geheimen) Variablen unveraendert
+# weiterverwendet werden.
+
+services:
+  caddy:
+    volumes:
+      - ./infra/caddy/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL muss fuer das Produktiv-Profil gesetzt sein}
+      CADDY_ACME_CA: ${CADDY_ACME_CA:-}
+
+  api:
+    secrets:
+      - supabase_service_role_key
+      - supabase_jwt_secret
+      - s3_secret_key
+
+  worker:
+    secrets:
+      - supabase_service_role_key
+      - supabase_jwt_secret
+      - s3_secret_key
+
+  # Nur relevant, wenn zusaetzlich --profile local-db genutzt wird (self-
+  # hosted ohne Supabase) - ersetzt das Klartext-Passwort durch die native
+  # Postgres-Image-Mechanik POSTGRES_PASSWORD_FILE.
+  postgres:
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-finanzplaner}
+      # Leer ueberschreiben: das offizielle Postgres-Image lehnt es ab, wenn
+      # POSTGRES_PASSWORD und POSTGRES_PASSWORD_FILE gleichzeitig gesetzt
+      # sind - die Basisdatei setzt POSTGRES_PASSWORD, hier wird nur die
+      # _FILE-Variante genutzt.
+      POSTGRES_PASSWORD: ""
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+
+secrets:
+  supabase_service_role_key:
+    file: ./secrets/supabase_service_role_key
+  supabase_jwt_secret:
+    file: ./secrets/supabase_jwt_secret
+  s3_secret_key:
+    file: ./secrets/s3_secret_key
+  postgres_password:
+    file: ./secrets/postgres_password

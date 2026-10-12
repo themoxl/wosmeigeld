@@ -1,0 +1,33 @@
+dramatiq[redis]==1.17.1
+# Der Vertragsabgleich (worker/contracts/reconcile.py) laedt den Motor aus
+# services/api; dessen Modulkette endet bei "from fastapi import HTTPException".
+# Ohne diese Zeile brechen reconcile_contracts und reconcile_all_contracts bei
+# jedem Lauf mit ModuleNotFoundError ab. Version identisch zu
+# services/api/requirements.txt - zwei Staende desselben Pakets in einem
+# Modulbaum waeren schwer zu erklaeren.
+fastapi==0.115.6
+# Das KI-Feld (app/assistant, ausgefuehrt in der KI-Warteschlange) liest ueber
+# dieselben Lesepfade wie die API - einige davon liegen in Routenmodulen, die
+# beim Import app.auth (PyJWT) laden. Version identisch zu
+# services/api/requirements.txt.
+PyJWT[crypto]==2.10.1
+periodiq==0.14.0
+redis==5.2.1
+pydantic-settings==2.7.1
+pydantic==2.10.5
+httpx==0.28.1
+# Anthropic (Claude) als waehlbarer KI-Anbieter (app/llm/anthropic_api.py).
+# Version in API und Worker identisch - der Worker laedt denselben KI-Kern.
+anthropic==1.13.0
+sqlalchemy==2.0.37
+psycopg[binary]==3.2.4
+openpyxl==3.1.5
+xlrd==2.0.1
+defusedxml==0.7.1
+pypdf==6.14.2
+pypdfium2==5.12.1
+pymupdf==1.28.2
+Pillow==12.3.0
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0
+opentelemetry-exporter-otlp-proto-http==1.44.0

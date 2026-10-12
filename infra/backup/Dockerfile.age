@@ -1,0 +1,5 @@
+# Wirft "age" (Verschluesselung) und "age-keygen" bereit, ohne dass Operatoren
+# es auf dem Host installieren muessen - konsistent mit dem restlichen Repo,
+# das Docker als einzige harte Abhaengigkeit voraussetzt. Siehe README.md.
+FROM alpine:3.19
+RUN apk add --no-cache age

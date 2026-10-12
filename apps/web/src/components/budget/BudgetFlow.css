@@ -1,0 +1,494 @@
+/* -------------------------------------------------------------------------
+   BudgetFlow - der rote Faden der Budgetseite
+
+   Co-located zur Komponente und dort importiert. Vite buendelt die Datei
+   global, es gibt also KEINE Kapselung: jede Klasse traegt deshalb das
+   Praefix .budget-flow, und alle Groessen leben als lokale Variablen auf dem
+   Wurzelelement.
+
+   Farbregel: ausschliesslich die semantischen Tokens bzw. color-mix() gegen
+   --color-surface / --color-surface-raised. Kein fester Hexwert, damit die
+   Komponente in beiden Themes ohne Zusatzregel mitkippt. Fester rgba-Wert ist
+   nur fuer Schatten zulaessig - hier kommt keiner vor.
+
+   Optischer Code des Repos (siehe .planning-equation in global.css):
+   gestrichelte Goldkante = Erwartung/Vorausschau, durchgezogene Kante =
+   gebuchtes Geld.
+   ------------------------------------------------------------------------- */
+
+.budget-flow {
+  --budget-flow-rank: 26px;
+  --budget-flow-meter: 170px;
+  --budget-flow-amount: 128px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* --- Rahmen der beiden Bloecke ------------------------------------------ */
+
+.budget-flow__panel {
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+}
+
+.budget-flow__panel--forecast {
+  background: color-mix(in srgb, var(--color-highlight-muted) 62%, var(--color-surface));
+  border: 1px dashed var(--color-highlight);
+  border-left-width: 3px;
+}
+
+.budget-flow__panel--booked {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}
+
+.budget-flow__panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.budget-flow__title {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.budget-flow__panel-note {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  text-align: right;
+}
+
+.budget-flow__panel-note--block {
+  display: block;
+  max-width: 78ch;
+  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+  font-size: 12px;
+  text-align: left;
+}
+
+/* --- Kette ---------------------------------------------------------------
+   <ol> statt <div>: die Reihenfolge der Stufen ist die Aussage, sie gehoert
+   in die Struktur und nicht nur in die Optik. */
+
+.budget-flow__ledger {
+  display: grid;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  list-style: none;
+}
+
+.budget-flow__row {
+  display: grid;
+  grid-template-columns:
+    var(--budget-flow-rank)
+    minmax(0, 1fr)
+    minmax(0, var(--budget-flow-meter))
+    minmax(var(--budget-flow-amount), auto);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.budget-flow__row:last-child {
+  border-bottom: 0;
+}
+
+.budget-flow__row--stage {
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+}
+
+/* Abzuege sind eingerueckt und leiser als die Stufenergebnisse - sie sind
+   Zwischenschritte, keine Aussage fuer sich. */
+.budget-flow__row--deduction {
+  padding-left: calc(var(--space-3) + var(--space-5));
+  background: transparent;
+}
+
+.budget-flow__row--reserve {
+  border-left: 2px dashed var(--color-highlight);
+  background: color-mix(in srgb, var(--color-highlight-muted) 42%, transparent);
+}
+
+.budget-flow__row--result {
+  background: color-mix(in srgb, var(--color-positive) 10%, var(--color-surface-raised));
+  border-left: 3px solid var(--color-positive);
+}
+
+.budget-flow__row--gap {
+  background: color-mix(in srgb, var(--color-warning) 10%, var(--color-surface-raised));
+  border-left: 3px solid var(--color-warning);
+}
+
+.budget-flow__rank,
+.budget-flow__sign {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.budget-flow__rank {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-primary);
+}
+
+.budget-flow__sign {
+  font-size: 14px;
+}
+
+.budget-flow__main {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.budget-flow__label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.budget-flow__label--quiet {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.budget-flow__hint {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.budget-flow__hint em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* --- Balken --------------------------------------------------------------
+   Handgemacht: zwei Hoehen (Stufe kraeftig, Abzug leise) und der Prozentwert
+   als echter Text darunter. Der Balken selbst ist aria-hidden, damit nicht
+   jede Zeile eine zweite Progressbar in den Screenreader schiebt. */
+
+.budget-flow__meter {
+  display: grid;
+  gap: 3px;
+}
+
+.budget-flow__bar {
+  height: 8px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-text-secondary) 18%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.budget-flow__row--deduction .budget-flow__bar {
+  height: 5px;
+}
+
+.budget-flow__bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 160ms ease-out;
+}
+
+.budget-flow__bar-fill--positive {
+  background: var(--color-positive);
+}
+
+.budget-flow__bar-fill--warning {
+  background: var(--color-warning);
+}
+
+.budget-flow__bar-fill--highlight {
+  background: var(--color-highlight);
+}
+
+.budget-flow__bar-fill--neutral {
+  background: color-mix(in srgb, var(--color-text-secondary) 60%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .budget-flow__bar-fill {
+    transition: none;
+  }
+}
+
+.budget-flow__share {
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Betraege ------------------------------------------------------------
+   Mono und tabular-nums, damit die Nachkommastellen aller Stufen exakt
+   untereinander stehen - das ist der halbe Lesbarkeitsgewinn der Kette. */
+
+.budget-flow__amount {
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.budget-flow__row--stage .budget-flow__amount {
+  font-size: 16px;
+}
+
+.budget-flow__row--result .budget-flow__amount,
+.budget-flow__row--gap .budget-flow__amount {
+  font-size: clamp(18px, 2vw, 24px);
+}
+
+.budget-flow__amount--quiet {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.budget-flow__amount--positive {
+  color: var(--color-positive);
+}
+
+.budget-flow__amount--warning {
+  color: var(--color-warning);
+}
+
+/* --- Fakten unter Stufe 1 ------------------------------------------------ */
+
+.budget-flow__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--space-4);
+  margin: var(--space-2) 0 0;
+}
+
+.budget-flow__fact {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.budget-flow__fact dt {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.budget-flow__fact dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* --- Fixkostenquote ------------------------------------------------------ */
+
+.budget-flow__ratio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.budget-flow__ratio-label {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.budget-flow__ratio-value {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.budget-flow__ratio-bar {
+  min-width: 96px;
+  max-width: 200px;
+  flex: 1 1 120px;
+}
+
+/* --- Schalter ------------------------------------------------------------ */
+
+.budget-flow__toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--color-highlight-muted) 55%, transparent);
+  border: 1px dashed var(--color-highlight);
+  border-radius: var(--radius-sm);
+}
+
+.budget-flow__toggle-main {
+  min-width: 0;
+}
+
+.budget-flow__toggle-hint {
+  margin: 4px 0 0 24px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.budget-flow__toggle-aside {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.budget-flow__aside-fact {
+  display: grid;
+  gap: 2px;
+}
+
+.budget-flow__aside-fact span {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.budget-flow__aside-fact strong {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Block 2: gebuchtes Geld -------------------------------------------- */
+
+.budget-flow__booked-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.budget-flow__stat {
+  display: grid;
+  gap: 3px;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.budget-flow__stat-label {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.budget-flow__stat-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.budget-flow__stat-hint {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.budget-flow__booked-progress {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.budget-flow__warn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-warning-muted) 72%, transparent);
+  border-left: 3px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* --- Schmale Ansicht -----------------------------------------------------
+   Der Balken rutscht unter Bezeichnung und Betrag, statt beide zu quetschen.
+   Beträge bleiben rechtsbuendig, damit die Kette lesbar bleibt. */
+
+@media (max-width: 780px) {
+  .budget-flow__panel {
+    padding: var(--space-4);
+  }
+
+  .budget-flow__panel-header {
+    flex-direction: column;
+  }
+
+  .budget-flow__panel-note {
+    text-align: left;
+  }
+
+  .budget-flow__row {
+    grid-template-columns: var(--budget-flow-rank) minmax(0, 1fr) minmax(0, auto);
+    align-items: start;
+  }
+
+  .budget-flow__rank,
+  .budget-flow__sign {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .budget-flow__main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .budget-flow__amount {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .budget-flow__meter {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+
+  .budget-flow__row--deduction {
+    padding-left: calc(var(--space-3) + var(--space-3));
+  }
+
+  .budget-flow__toggle-aside {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

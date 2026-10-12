@@ -1,0 +1,2442 @@
+/* Versicherungen (docs/VERSICHERUNGEN-PLAN.md, P1).
+ *
+ * Die wichtigste Regel dieser Datei ist fachlich und nicht kosmetisch: ein
+ * bestaetigtes Datum und ein angenommenes duerfen einander nie aehnlich sehen.
+ * Bestaetigt ist kraeftig und traegt einen Countdown, angenommen ist ruhig,
+ * gestrichelt unterstrichen und ausdruecklich ohne Countdown, nicht berechenbar
+ * ist eine Aussage in Warnfarbe. Wer hier eine Farbe angleicht, hebelt
+ * Abschnitt 2.4 des Plans aus.
+ *
+ * Vier Tokens fehlen dem globalen Satz (faint, gesenkte Flaeche, kraeftiger
+ * Rand). Sie werden hier aus vorhandenen Tokens gemischt, damit kein zweiter
+ * Farbsatz neben @finanzplaner/design-tokens entsteht.
+ */
+
+.insurance-page {
+  --insurance-faint: color-mix(in srgb, var(--color-text-secondary) 72%, var(--color-background));
+  --insurance-sunk: color-mix(in srgb, var(--color-background) 55%, var(--color-surface-raised));
+  --insurance-rule: color-mix(in srgb, var(--color-border) 65%, var(--color-text-secondary));
+  max-width: 1580px;
+  margin: 0 auto;
+  color: var(--color-text-primary);
+}
+
+.insurance-page .page-header {
+  align-items: flex-end;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.insurance-page .page-header .card-body {
+  max-width: 62ch;
+}
+
+.insurance-error {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-warning-muted);
+  color: var(--color-warning-strong, var(--color-warning));
+  font-size: 13px;
+}
+
+/* ---------- Blockrahmen ---------- */
+
+.insurance-block {
+  margin-bottom: var(--space-6);
+}
+
+.insurance-block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.insurance-block-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.insurance-block-hint {
+  font-size: 12px;
+  color: var(--insurance-faint);
+}
+
+.insurance-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Jetzt wichtig ---------- */
+
+.insurance-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.insurance-task {
+  display: grid;
+  grid-template-columns: 3px minmax(0, 1fr) auto;
+  gap: 0 var(--space-4);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.insurance-task:first-child {
+  padding-top: 0;
+}
+
+.insurance-task:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.insurance-task-stripe {
+  align-self: stretch;
+  border-radius: 2px;
+}
+
+.insurance-task--urgent .insurance-task-stripe {
+  background-color: var(--color-warning);
+}
+
+.insurance-task--open .insurance-task-stripe {
+  background-color: var(--color-highlight);
+}
+
+.insurance-task--info .insurance-task-stripe {
+  background-color: var(--insurance-rule);
+}
+
+.insurance-task-main {
+  min-width: 0;
+}
+
+.insurance-task-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.insurance-task-what {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.insurance-task-policy {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-task-why {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--insurance-faint);
+}
+
+.insurance-task-side {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.insurance-task-when {
+  text-align: right;
+}
+
+.insurance-task-date {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.insurance-task-days {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+/* Ein angenommenes Datum bekommt auch in der Aufgabenliste keinen Countdown. */
+.insurance-task-days--assumed {
+  color: var(--color-highlight);
+}
+
+.insurance-task-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.insurance-inline-button {
+  align-self: center;
+  padding: 6px 12px;
+}
+
+/* ---------- Bestand uebernehmen ---------- */
+
+.insurance-intake {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.insurance-intake-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.insurance-intake-count {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 18px;
+}
+
+.insurance-intake-count strong {
+  color: var(--color-positive);
+  font-size: 22px;
+}
+
+.insurance-intake-bar {
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--color-highlight-muted);
+  overflow: hidden;
+}
+
+.insurance-intake-bar-done {
+  display: block;
+  height: 100%;
+  background-color: var(--color-positive);
+}
+
+.insurance-intake-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.insurance-step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-positive);
+  flex: none;
+}
+
+.insurance-step--open {
+  color: var(--color-highlight);
+  font-weight: 600;
+}
+
+.insurance-step--open .insurance-step-dot {
+  background-color: transparent;
+  border: 2px solid var(--color-highlight);
+}
+
+.insurance-reason {
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+}
+
+/* ---------- Policenliste ---------- */
+
+.insurance-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.insurance-search {
+  flex: 1 1 22rem;
+  display: grid;
+}
+
+.insurance-filter {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--insurance-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.insurance-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--insurance-faint);
+  margin-left: auto;
+}
+
+.insurance-empty {
+  color: var(--color-text-secondary);
+}
+
+.insurance-empty p {
+  margin: var(--space-2) 0 0;
+}
+
+.insurance-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.insurance-table-scroll {
+  overflow-x: auto;
+}
+
+/* Die globale Tabelle arbeitet mit festen Spaltenbreiten; hier bestimmt der
+   Inhalt die Breite, und die Karte scrollt notfalls waagerecht. */
+.insurance-table {
+  table-layout: auto;
+  min-width: 62rem;
+  background-color: transparent;
+}
+
+.insurance-table .txn-th {
+  background-color: var(--insurance-sunk);
+}
+
+.insurance-table .txn-td {
+  padding: var(--space-3);
+  vertical-align: top;
+}
+
+.insurance-row--selected {
+  background-color: var(--color-positive-muted);
+}
+
+.insurance-row-action {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.insurance-line-name {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.insurance-status-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+  color: var(--insurance-faint);
+  font-weight: 700;
+}
+
+.insurance-line-purpose {
+  margin: 3px 0 0;
+  font-family: var(--font-heading);
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  max-width: 36ch;
+}
+
+.insurance-insurer {
+  font-size: 13px;
+}
+
+.insurance-policy-number {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--insurance-faint);
+  margin-top: 2px;
+}
+
+.insurance-policy-label {
+  font-size: 11.5px;
+  color: var(--insurance-faint);
+  margin-top: 2px;
+}
+
+/* ---------- Beitrag mit Herkunft ---------- */
+
+.insurance-amount {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.insurance-amount-value {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.insurance-amount-origin {
+  font-size: 11px;
+  color: var(--insurance-faint);
+}
+
+.insurance-amount--external .insurance-amount-value {
+  color: var(--color-text-secondary);
+}
+
+.insurance-amount--none .insurance-amount-value {
+  color: var(--insurance-faint);
+}
+
+/* ---------- Datum und seine Herkunft ---------- */
+
+.insurance-date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.insurance-date-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.insurance-date-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.insurance-date-origin {
+  font-size: 11px;
+  color: var(--insurance-faint);
+}
+
+/* Bestaetigt: kraeftig, gefuellter Punkt, mit Countdown. */
+.insurance-date--confirmed .insurance-date-value {
+  color: var(--color-positive);
+  font-weight: 600;
+}
+
+.insurance-date--confirmed .insurance-date-dot {
+  background-color: var(--color-positive);
+}
+
+/* Angenommen: ruhiger, gestrichelt unterstrichen, offener Punkt, ohne
+   Countdown. Die Form traegt die Aussage mit, nicht nur die Farbe. */
+.insurance-date--assumed .insurance-date-value {
+  color: var(--color-highlight);
+  border-bottom: 1.5px dashed var(--color-highlight);
+  padding-bottom: 1px;
+}
+
+.insurance-date--assumed .insurance-date-dot {
+  background-color: transparent;
+  border: 1.5px solid var(--color-highlight);
+}
+
+/* Nicht berechenbar: eine Aussage, kein leeres Feld. */
+.insurance-date--none .insurance-date-value {
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+.insurance-date--none .insurance-date-dot {
+  background-color: transparent;
+  border: 1.5px dotted var(--color-warning);
+}
+
+.insurance-countdown {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--insurance-faint);
+}
+
+.insurance-countdown--warning {
+  color: var(--color-warning-strong, var(--color-warning));
+  font-weight: 600;
+}
+
+.insurance-countdown--highlight {
+  color: var(--color-highlight);
+}
+
+.insurance-countdown--muted {
+  color: var(--insurance-faint);
+  font-style: italic;
+}
+
+.insurance-task-hint {
+  font-size: 12.5px;
+  color: var(--color-highlight);
+  font-weight: 600;
+}
+
+.insurance-task-hint--none {
+  color: var(--insurance-faint);
+  font-weight: 400;
+}
+
+/* ---------- Kennzahlenleiste unter der Liste ---------- */
+
+.insurance-metrics {
+  margin: calc(-1 * var(--space-3)) 0 var(--space-6);
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Policendetail ---------- */
+
+/* Der Ernstfallblock legt vier bis sechs Angaben nebeneinander; auf den 860 px
+   des Standarddialogs brechen sie in eine Spalte um und die Nummer rutscht
+   unter die Falz. */
+.insurance-detail-modal {
+  max-width: 1040px;
+}
+
+.insurance-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.insurance-emergency {
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-positive);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-raised);
+  padding: var(--space-4);
+}
+
+.insurance-emergency-title {
+  margin: 0 0 var(--space-3);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-positive);
+  font-weight: 700;
+}
+
+.insurance-emergency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--space-4);
+}
+
+.insurance-emergency-grid > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.insurance-field-label {
+  font-size: 11px;
+  color: var(--insurance-faint);
+}
+
+.insurance-field-value {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.insurance-field-value--mono {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.insurance-field-value--missing {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--insurance-faint);
+}
+
+.insurance-completeness {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-completeness-bar {
+  flex: 1 1 8rem;
+  max-width: 16rem;
+  height: 5px;
+  border-radius: 3px;
+  background-color: var(--insurance-sunk);
+  overflow: hidden;
+}
+
+.insurance-completeness-bar span {
+  display: block;
+  height: 100%;
+  background-color: var(--color-positive);
+}
+
+.insurance-detail-section h3 {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+}
+
+.insurance-detail-section > .card-body {
+  margin: 0;
+}
+
+.insurance-purpose {
+  background-color: var(--insurance-sunk);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+/* Der Vorbehalt steht ueber dem Text, den er einordnet - als Fussnote wirkte
+   er wie Kleingedrucktes (Plan 3.11). */
+.insurance-purpose-caveat {
+  margin: 0 0 var(--space-2);
+  font-size: 11.5px;
+  color: var(--insurance-faint);
+}
+
+.insurance-purpose-text {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.insurance-coverage-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.insurance-coverage-split h4 {
+  margin: 0 0 var(--space-2);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--insurance-faint);
+}
+
+.insurance-coverage-split ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  display: grid;
+  gap: 2px;
+}
+
+.insurance-purpose-source,
+.insurance-purpose-note {
+  margin: var(--space-3) 0 0;
+  font-size: 11.5px;
+  color: var(--insurance-faint);
+  overflow-wrap: anywhere;
+}
+
+.insurance-kv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.insurance-kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 13px;
+  border-bottom: 1px dotted var(--color-border);
+  padding-bottom: var(--space-2);
+}
+
+.insurance-kv-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.insurance-kv-row dt {
+  color: var(--color-text-secondary);
+}
+
+.insurance-kv-row dd {
+  margin: 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.insurance-kv-origin {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--insurance-faint);
+}
+
+.insurance-note {
+  margin: var(--space-3) 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.insurance-action-card {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-action-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.insurance-field {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--insurance-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.insurance-premium {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-link-out {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.insurance-link-out:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Fristenleiste ueber zwoelf Monate (P2) ---------- */
+
+/* Die Achse braucht Breite: zwoelf Monatsmarken und ein Dutzend Namen. Sie
+   bekommt sie ueber eine feste Mindestbreite und scrollt notfalls waagerecht -
+   die Seite selbst tut das ausdruecklich nicht. Eine gestauchte Achse waere
+   die schlechtere Loesung: auf ihr sehen zwei Termine im selben Monat aus wie
+   einer, und genau die Haeufung soll die Grafik zeigen. */
+.insurance-timeline {
+  padding: var(--space-4) var(--space-5);
+}
+
+.insurance-tl-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.insurance-tl-track {
+  position: relative;
+  min-width: 60rem;
+  margin-top: var(--space-3);
+}
+
+.insurance-tl-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  height: 1px;
+  background-color: var(--insurance-rule);
+}
+
+/* Heute. Ohne diese Linie beginnt die Achse am Monatsersten, und der Nutzer
+   liest den laufenden Monat als vollstaendig verfuegbare Zeit. */
+.insurance-tl-today {
+  position: absolute;
+  top: 0;
+  bottom: 22px;
+  width: 0;
+  border-left: 1px dashed var(--insurance-rule);
+}
+
+.insurance-tl-tick {
+  position: absolute;
+  bottom: 17px;
+  width: 1px;
+  height: 5px;
+  background-color: var(--insurance-rule);
+}
+
+.insurance-tl-month {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--insurance-faint);
+  white-space: nowrap;
+}
+
+.insurance-tl-year {
+  font-size: 9px;
+  opacity: 0.75;
+}
+
+.insurance-tl-mark {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+}
+
+button.insurance-tl-mark {
+  cursor: pointer;
+}
+
+button.insurance-tl-mark:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.insurance-tl-label {
+  font-size: 10.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.insurance-tl-days {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.insurance-tl-days--warning {
+  color: var(--color-warning-strong, var(--color-warning));
+  font-weight: 600;
+}
+
+.insurance-tl-days--highlight {
+  color: var(--color-highlight);
+}
+
+.insurance-tl-days--neutral {
+  color: var(--insurance-faint);
+}
+
+.insurance-tl-bead {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.insurance-tl-pin {
+  width: 2px;
+  flex: none;
+}
+
+/* Bestaetigt: gefuellte Perle, kraeftig - dieselbe Sprache wie in der Liste. */
+.insurance-tl-mark--confirmed .insurance-tl-bead,
+.insurance-tl-mark--confirmed .insurance-tl-pin {
+  background-color: var(--color-positive);
+}
+
+.insurance-tl-mark--confirmed .insurance-tl-label {
+  color: var(--color-positive);
+  font-weight: 600;
+}
+
+/* Angenommen: offene Perle, blasser Stiel, das Fragezeichen steht am Namen.
+   Wer hier die Fuellung angleicht, macht aus einer Annahme eine Tatsache. */
+.insurance-tl-mark--assumed .insurance-tl-bead {
+  background-color: transparent;
+  border: 1.5px solid var(--color-highlight);
+}
+
+.insurance-tl-mark--assumed .insurance-tl-pin {
+  background-color: var(--color-highlight);
+  opacity: 0.5;
+}
+
+.insurance-tl-mark--assumed .insurance-tl-label {
+  color: var(--color-highlight);
+  font-weight: 500;
+}
+
+.insurance-tl-mark--selected .insurance-tl-label {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.insurance-tl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-3);
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-tl-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.insurance-tl-key {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.insurance-tl-key--confirmed {
+  background-color: var(--color-positive);
+}
+
+.insurance-tl-key--assumed {
+  border: 1.5px solid var(--color-highlight);
+}
+
+.insurance-tl-note {
+  margin: var(--space-3) 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.insurance-tl-note--missing strong {
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+/* ---------- Herleitung einer Frist (P2) ---------- */
+
+.insurance-derivation {
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.insurance-derivation-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.insurance-derivation-head h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.insurance-derivation-subject {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-derivation-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* Die Kette ist eine geordnete Liste, weil sie eine ist: jedes Glied folgt
+   aus dem vorigen. Der senkrechte Strich links macht das sichtbar. */
+.insurance-chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.insurance-chain-step {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.insurance-chain-step:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.insurance-chain-marker {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1.5px solid var(--insurance-rule);
+  color: var(--insurance-faint);
+}
+
+.insurance-chain-step--confirmed .insurance-chain-marker {
+  border-color: var(--color-positive);
+  color: var(--color-positive);
+}
+
+.insurance-chain-step--assumed .insurance-chain-marker {
+  border-style: dashed;
+  border-color: var(--color-highlight);
+  color: var(--color-highlight);
+}
+
+.insurance-chain-step--not_computable .insurance-chain-marker {
+  border-style: dotted;
+  border-color: var(--color-warning);
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+.insurance-chain-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.insurance-chain-label {
+  font-size: 11px;
+  color: var(--insurance-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.insurance-chain-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.insurance-chain-step--confirmed .insurance-chain-value {
+  color: var(--color-positive);
+  font-weight: 600;
+}
+
+.insurance-chain-step--assumed .insurance-chain-value {
+  color: var(--color-highlight);
+}
+
+.insurance-chain-step--not_computable .insurance-chain-value {
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+.insurance-chain-origin {
+  font-size: 11px;
+  color: var(--insurance-faint);
+}
+
+.insurance-chain-note {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+}
+
+.insurance-derivation-outcome {
+  border-left: 3px solid var(--color-positive);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+  padding: var(--space-3) var(--space-4);
+}
+
+.insurance-derivation-outcome strong {
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.insurance-derivation-basis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.insurance-derivation-basis .insurance-kv-row dd {
+  max-width: 52ch;
+}
+
+.insurance-derivation-warning {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-highlight);
+  background-color: var(--color-highlight-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* ---------- Erinnerungen (P2) ---------- */
+
+.insurance-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.insurance-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.insurance-settings-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12rem;
+  gap: var(--space-2) var(--space-4);
+  align-items: end;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.insurance-settings-group:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.insurance-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.insurance-switch input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent);
+}
+
+.insurance-settings-help {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+}
+
+.insurance-settings-problem {
+  color: var(--color-warning-strong, var(--color-warning));
+  font-weight: 600;
+}
+
+.insurance-settings-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--insurance-faint);
+  max-width: 82ch;
+}
+
+/* ---------- Beitraege: Band, Treppe, Dialoge (P3) ---------- */
+
+/* Das Sonderkuendigungsband ist der einzige Streifen dieses Moduls, der laut
+   werden darf. Er steht fuer eine Frist, die in Tagen laeuft und danach weg
+   ist - anders als die ordentliche Kuendigungsfrist, die im naechsten Jahr
+   wiederkommt. Deshalb Warnfarbe und ein kraeftiger linker Balken; deshalb
+   aber auch nur DANN, wenn ein Fenster tatsaechlich laeuft. Ein Dauerstreifen
+   in Warnfarbe waere nach zwei Wochen unsichtbar. */
+.insurance-special-band {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-warning);
+  border-left: 4px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  background-color: var(--color-warning-muted);
+}
+
+.insurance-special-band-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: min(100%, 28rem);
+  flex: 1 1 28rem;
+}
+
+.insurance-special-band-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+.insurance-special-band-reason {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 78ch;
+}
+
+/* Handlungsdatum gross, Fristende daneben: ein einzelnes Feld "Fristende" ist
+   die eigentliche Fehlerquelle, und die Rangfolge der beiden entscheidet, ob
+   der Nutzer rechtzeitig absendet oder erst am letzten Tag. */
+.insurance-special-band-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+}
+
+.insurance-special-band-dates dt {
+  font-size: 11px;
+  color: var(--insurance-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.insurance-special-band-dates dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.insurance-special-band-primary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 15px !important;
+  font-weight: 600;
+}
+
+.insurance-special-band-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  max-width: 82ch;
+}
+
+.insurance-special-band-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  text-align: right;
+  max-width: 22rem;
+}
+
+.insurance-premium-register {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-top: var(--space-4);
+}
+
+/* Steigerung und Senkung unterscheiden sich in der Farbe UND im Vorzeichen.
+   Farbe allein traegt keine Aussage - wer sie nicht unterscheidet, liest das
+   Vorzeichen. */
+.insurance-delta {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.insurance-delta--up {
+  color: var(--color-warning-strong, var(--color-warning));
+}
+
+.insurance-delta--down {
+  color: var(--color-positive);
+}
+
+.insurance-notice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-notice-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+}
+
+.insurance-notice-head {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.insurance-notice-state {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  max-width: 72ch;
+}
+
+.insurance-notice-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* ---------- Formulare der beiden Dialoge (P3) ---------- */
+
+.insurance-notice-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Die beiden Datumsfelder stehen nebeneinander, damit der Unterschied
+   sichtbar ist statt erklaert. Untereinander liest niemand den zweiten
+   Hilfetext - und genau die Verwechslung dieser beiden Daten kostet das
+   Sonderkuendigungsrecht. */
+.insurance-date-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-4);
+}
+
+.insurance-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4);
+}
+
+.insurance-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.insurance-form-field--anchor {
+  padding: var(--space-3);
+  margin: calc(-1 * var(--space-3));
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+  border-left: 3px solid var(--color-highlight);
+}
+
+.insurance-form-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.insurance-anchor-mark {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: var(--color-highlight-muted);
+  color: var(--color-highlight);
+}
+
+.insurance-anchor-mark--off {
+  background-color: transparent;
+  border: 1px dashed var(--insurance-rule);
+  color: var(--insurance-faint);
+}
+
+.insurance-form-help {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  max-width: 62ch;
+}
+
+.insurance-delta-preview {
+  margin: 0;
+  font-size: 13px;
+}
+
+.insurance-disclosure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-mode-choice {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  align-items: center;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Mitgenommen und neu stehen nebeneinander, nicht untereinander: die Frage
+   beim Wechsel ist nicht "was passiert", sondern "was verliere ich" - und die
+   beantwortet nur der Vergleich. */
+.insurance-carry-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-4);
+}
+
+.insurance-carry {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+  border-left: 3px solid var(--insurance-rule);
+}
+
+.insurance-carry--keep {
+  border-left-color: var(--color-positive);
+}
+
+.insurance-carry--new {
+  border-left-color: var(--color-highlight);
+}
+
+.insurance-carry h3 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.insurance-carry ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .insurance-task {
+    grid-template-columns: 3px minmax(0, 1fr);
+  }
+
+  .insurance-task-side {
+    grid-column: 2;
+    justify-content: flex-start;
+    margin-top: var(--space-2);
+  }
+
+  .insurance-task-when {
+    text-align: left;
+  }
+
+  .insurance-settings-group {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .insurance-special-band-side {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ---------- Register Personen, Objekte, Kennzeichen, Deckung (P4) ---------- */
+
+/* Vier Register mit derselben Bauform: Ueberschrift, ein Satz, eine Liste, ein
+   Formular. Sie sehen absichtlich gleich aus - der Nutzer soll nicht bei jedem
+   Registerwechsel neu lernen, wo die Aktion sitzt. */
+.insurance-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.insurance-panel h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.insurance-panel > .card-body {
+  margin: 0;
+  max-width: 72ch;
+}
+
+.insurance-panel-subtitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Der Hinweis auf eine Folge, die man sonst erst nach dem Speichern bemerkt:
+   die verengte Sichtbarkeit einer gesundheitsnahen Police und der Wechsel der
+   Zweckaussage. Ruhig gehalten - er warnt nicht, er erklaert. */
+.insurance-scope-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-highlight);
+  background-color: var(--insurance-sunk);
+  font-size: 12.5px;
+  line-height: 1.5;
+  max-width: 78ch;
+}
+
+.insurance-empty-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--insurance-rule);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Fehlerlisten: dieselbe Optik wie die einzelne Fehlerzeile, nur mit
+   Aufzaehlung - sonst haette dieselbe Meldung zwei Erscheinungsbilder. */
+ul.insurance-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-4) + 0.6rem);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ---------- Liste der Beteiligten und Objekte ---------- */
+
+.insurance-entity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-entity {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-entity-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.insurance-entity-title {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* Die Nebenangaben stehen in einer Zeile mit Trennpunkten statt untereinander:
+   sie beantworten zusammen eine Frage - wer, in welcher Rolle, seit wann. */
+.insurance-entity-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--space-3);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-entity-meta > span + span::before {
+  content: "·";
+  margin-right: var(--space-3);
+  color: var(--insurance-rule);
+}
+
+.insurance-entity-note {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.insurance-entity-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.insurance-role-chip,
+.insurance-kind-chip {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: var(--color-highlight-muted);
+  color: var(--color-highlight);
+}
+
+.insurance-kind-chip {
+  background-color: var(--insurance-sunk);
+  color: var(--insurance-faint);
+}
+
+/* Ein abgegebenes Objekt bleibt stehen - es traegt alte Buchungen. Es sieht
+   nur nicht mehr aus wie ein laufendes. */
+.insurance-kind-chip--gone {
+  border: 1px dashed var(--insurance-rule);
+  background-color: transparent;
+}
+
+/* Eine fehlende Angabe wird benannt und nicht durch einen Gedankenstrich
+   ersetzt: an dieser Stelle haengt die Erwerberfrist. */
+.insurance-missing {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.insurance-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+  border-left: 3px solid var(--color-warning);
+}
+
+.insurance-confirm p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* Das Feld, an dem eine Frist haengt - Erwerb, Beginn einer Zulassung. Es
+   traegt denselben Balken wie der Fristanker im Anpassungsdialog. */
+.insurance-field--anchor {
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--color-highlight);
+}
+
+/* ---------- Kennzeichenhistorie ---------- */
+
+/* Ein Zeitstrahl von oben nach unten, neueste Zeile zuerst: die laufende
+   Zulassung beantwortet die Frage, mit der man dieses Register oeffnet. Die
+   Linie macht sichtbar, dass die alten Zeilen bestehen bleiben - sie werden
+   nicht ersetzt, sie werden geschlossen. */
+.insurance-reg-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-left: 2px solid var(--insurance-rule);
+}
+
+.insurance-reg-entry {
+  position: relative;
+  display: flex;
+  gap: var(--space-3);
+}
+
+.insurance-reg-dot {
+  position: absolute;
+  left: calc(-1 * var(--space-4) - 6px);
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background-color: var(--color-surface);
+  border: 2px solid var(--insurance-rule);
+}
+
+.insurance-reg-entry--current .insurance-reg-dot {
+  background-color: var(--color-positive);
+  border-color: var(--color-positive);
+}
+
+.insurance-reg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.insurance-reg-plate {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono, monospace);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.insurance-reg-chip {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background-color: var(--color-positive-muted, var(--color-highlight-muted));
+  color: var(--color-positive);
+}
+
+/* Die Folge des Speicherns steht VOR dem Knopf. Ein neuer Eintrag beendet
+   einen bestehenden - das darf nicht wie ein blosses Hinzufuegen aussehen. */
+.insurance-preview {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+  border-left: 3px solid var(--color-highlight);
+}
+
+.insurance-preview-title {
+  margin: 0 0 var(--space-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--insurance-faint);
+}
+
+.insurance-preview ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* ---------- Deckungsbausteine ---------- */
+
+.insurance-coverage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.insurance-coverage-row {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-coverage-row:first-child {
+  border-top: none;
+}
+
+/* Erfasste Zeilen heben sich ab, nicht erfasste bleiben ruhig: die Liste ist
+   im Regelfall lang und ueberwiegend leer. */
+.insurance-coverage-row--included {
+  background-color: var(--insurance-sunk);
+  box-shadow: inset 3px 0 0 var(--color-positive);
+}
+
+.insurance-coverage-row--excluded {
+  box-shadow: inset 3px 0 0 var(--insurance-rule);
+}
+
+.insurance-coverage-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.insurance-coverage-head .insurance-field {
+  min-width: 11rem;
+}
+
+.insurance-coverage-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 22rem;
+}
+
+.insurance-coverage-purpose {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.insurance-coverage-detail {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--insurance-rule);
+}
+
+@media (max-width: 900px) {
+  .insurance-coverage-head .insurance-field {
+    min-width: 100%;
+  }
+
+  .insurance-coverage-text {
+    flex-basis: 100%;
+  }
+}
+
+/* ---------- Schäden: Band, Zeitstrahl, Zahlungen (P5) ---------- */
+
+/* Das Band des Schadenfalls ist dasselbe Bauteil wie das der
+   Beitragsanpassung - dieselbe Art Information, deshalb dieselbe Form. Nur
+   der Zustand färbt: ein Recht ohne feststehendes Ende darf nicht wie eine
+   ablaufende Frist aussehen, ein verfallenes nicht wie eine laufende. */
+.insurance-special-band--open_undetermined {
+  border-left-color: var(--color-highlight);
+}
+
+.insurance-special-band--expired {
+  border-left-color: var(--insurance-rule);
+  background-color: var(--insurance-sunk);
+}
+
+.insurance-special-band--expired .insurance-special-band-title {
+  color: var(--color-text-secondary);
+}
+
+/* Der Satz an der Stelle des fehlenden Datums. Er ist keine Warnung, sondern
+   eine Feststellung - deshalb ruhig gesetzt und nicht in Warnfarbe. */
+.insurance-special-band-missing {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  font-variant-numeric: normal;
+}
+
+.insurance-claim-stages {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.insurance-claim-stage {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-3) var(--space-1);
+}
+
+/* Die Linie zwischen den Punkten: sie endet an der letzten Stufe, damit der
+   Strahl nicht ins Leere zeigt. */
+.insurance-claim-stage::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--space-1) + 5px);
+  top: 22px;
+  bottom: -6px;
+  width: 1px;
+  background-color: var(--insurance-rule);
+}
+
+.insurance-claim-stage:last-child::before {
+  display: none;
+}
+
+.insurance-claim-stage-dot {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  margin-top: 6px;
+  border-radius: 50%;
+  border: 2px solid var(--insurance-rule);
+  background-color: var(--color-surface);
+  z-index: 1;
+}
+
+/* Erreicht ist gefüllt, offen ist hohl. Der Unterschied liegt nicht in der
+   Farbe allein - sonst wäre er für farbfehlsichtige Augen keiner. */
+.insurance-claim-stage--done .insurance-claim-stage-dot {
+  border-color: var(--color-positive);
+  background-color: var(--color-positive);
+}
+
+.insurance-claim-stage--open .insurance-claim-stage-dot {
+  border-style: dashed;
+}
+
+.insurance-claim-stage--cancelled .insurance-claim-stage-dot {
+  border-color: var(--insurance-rule);
+  background-color: var(--insurance-rule);
+  opacity: 0.55;
+}
+
+.insurance-claim-stage-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.insurance-claim-stage-label {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.insurance-claim-stage--open .insurance-claim-stage-label,
+.insurance-claim-stage--cancelled .insurance-claim-stage-label {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.insurance-claim-stage-date {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+}
+
+.insurance-claim-stage--done .insurance-claim-stage-date {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.insurance-claim-stage--open .insurance-claim-stage-date,
+.insurance-claim-stage--cancelled .insurance-claim-stage-date {
+  font-style: italic;
+}
+
+.insurance-claim-stage-note {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.insurance-claim-status {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Marke für zwei Aussagen, die beide keine Zahl sind: ein laufendes
+   Sonderkündigungsfenster und eine Zahlung ohne eigene Buchung. */
+.insurance-claim-chip {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background-color: var(--color-highlight-muted);
+  color: var(--color-highlight);
+}
+
+.insurance-evidence-list {
+  margin: 0;
+  padding-left: 1.05rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* Art, Betrag und Knopf bleiben in einer Zeile, solange die Spalte es
+   hergibt - die Zuordnung ist eine Handlung, keine Formularseite. */
+.insurance-allocate-row {
+  align-items: flex-end;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+}
+
+.insurance-allocate-row .insurance-field {
+  min-width: 7rem;
+}
+
+@media (max-width: 900px) {
+  .insurance-allocate-row {
+    flex-wrap: wrap;
+  }
+
+  .insurance-allocate-row .insurance-field {
+    min-width: 100%;
+  }
+}
+
+/* ---------- Bedarfsabgleich: Profil, Befunde, Doppelungen (P6) ---------- */
+
+/* Die Gestaltungsregel dieses Abschnitts ist dieselbe wie die fachliche: KEINE
+   Bewertung. Es gibt hier deshalb bewusst keine Farbskala ueber die sieben
+   Ergebniszustaende - kein Rot fuer "Luecke", kein Gruen fuer "erfuellt". Eine
+   solche Skala waere der Schutzscore, nur gemalt, und der ist ein Nicht-Ziel
+   des Plans (10.2). Was einen Befund einordnet, ist seine Gruppe und sein
+   Wortlaut. Farbe traegt hier nur zweierlei: der ruhige Hinweiskasten und die
+   Fehlerzeile - beides Aussagen ueber die Anwendung, nicht ueber den Nutzer.
+
+   Die Klassen heissen `insurance-*` und nicht `.finding-row` wie in Plan 6:
+   diese Datei traegt durchgehend das Modulpraefix, und ein einzelner
+   praefixloser Selektor in einer global geladenen Datei ist genau die Stelle,
+   an der spaeter etwas anderes mitgefaerbt wird. */
+
+.insurance-needs-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.insurance-needs-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.insurance-needs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-4);
+}
+
+.insurance-needs-question {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Die unbeantwortete Frage ist ein ZULAESSIGER Zustand und wird deshalb nicht
+   wie ein Versaeumnis gezeichnet: kein Warnrand, keine Ausgrauung, keine
+   Signalfarbe. Sie bekommt einen gestrichelten Rand und eine ruhige Marke,
+   damit sie sich von einem ausgesprochenen "nein" unterscheiden laesst - genau
+   darum geht es in diesem Formular. */
+.insurance-needs-question--unset .form-input {
+  border-style: dashed;
+}
+
+.insurance-needs-unset-mark {
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--insurance-faint);
+}
+
+.insurance-needs-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+.insurance-needs-checks legend {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--insurance-faint);
+  padding: 0 4px;
+}
+
+.insurance-needs-persons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+.insurance-needs-person {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+}
+
+.insurance-needs-missing > summary,
+.insurance-finding-group > summary,
+.insurance-finding-tier > summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.insurance-needs-missing-list {
+  margin: var(--space-2) 0 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* ---------- Befunde ---------- */
+
+.insurance-finding-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.insurance-finding-group-lead {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+}
+
+.insurance-finding-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Ein Befund ist eine Karte mit neutralem Rand - alle gleich, unabhaengig vom
+   Ergebniszustand. Der farbige Streifen links, den die Aufgabenliste traegt,
+   fehlt hier absichtlich: er waere die Ampel. */
+.insurance-finding {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.insurance-finding-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.insurance-finding-headline {
+  font-family: var(--font-heading);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+/* Der Ergebniszustand als Wort in einer einzigen, neutralen Marke. Sieben
+   Zustaende in sieben Farben waeren eine Skala, und eine Skala ist eine Note. */
+.insurance-finding-outcome {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--insurance-rule);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.insurance-finding-why {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 78ch;
+}
+
+.insurance-finding-person {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Der Ergebnissatz steht unter der Begruendung und traegt bewusst KEINE
+   Signalfarbe: er sagt, was gefunden wurde, nicht wie schlimm es ist. */
+.insurance-finding-outcome-reason {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+}
+
+.insurance-finding-expired-text {
+  margin: 0 0 var(--space-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+  flex-basis: 100%;
+}
+
+.insurance-finding-source {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--insurance-faint);
+  overflow-wrap: anywhere;
+}
+
+.insurance-finding-rule {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.insurance-finding-basis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+}
+
+.insurance-finding-basis-title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--insurance-faint);
+}
+
+.insurance-finding-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-2) var(--space-4);
+}
+
+.insurance-finding-fact dt {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--insurance-faint);
+}
+
+.insurance-finding-fact dd {
+  margin: 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.insurance-finding-fact-empty,
+.insurance-finding-policies,
+.insurance-finding-values {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Ein Knopf, der wie ein Verweis aussieht: die Police wird im Detail derselben
+   Seite geoeffnet, es gibt also keine Adresse, auf die ein `a` zeigen koennte. */
+.insurance-linklike {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-highlight);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.insurance-finding-tier > summary {
+  font-weight: 500;
+}
+
+.insurance-finding-decision,
+.insurance-finding-decided {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.insurance-finding-decided-text {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-width: 78ch;
+}
+
+.insurance-dismiss-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background-color: var(--insurance-sunk);
+}
+
+/* ---------- Doppelungen ---------- */
+
+.insurance-duplicate-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.insurance-duplicate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.insurance-duplicate-question {
+  font-family: var(--font-heading);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.insurance-duplicate-pair,
+.insurance-duplicate-why,
+.insurance-duplicate-amount {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  max-width: 78ch;
+}
+
+.insurance-duplicate-amount {
+  color: var(--color-text-secondary);
+}
+
+.insurance-duplicate-policy {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-highlight);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.insurance-duplicate-pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .insurance-needs-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .insurance-finding-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

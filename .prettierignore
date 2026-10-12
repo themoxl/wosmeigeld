@@ -1,0 +1,15 @@
+node_modules
+dist
+build
+.expo
+.turbo
+pnpm-lock.yaml
+apps/mobile/ios
+apps/mobile/android
+# Verschachtelte Git-Worktrees anderer paralleler Branches/Sessions (siehe
+# `git worktree list`) - eigene Checkouts mit eigenem Formatierungsstand,
+# nicht Teil dieses Arbeitsbaums.
+.claude/worktrees
+# Kopien aus sia_public/designkasten: tragen in Zeile 1 eine Pruefsumme ueber
+# ihren Inhalt (src/test/designs.test.ts) und werden nie hier formatiert.
+apps/web/public/designkasten

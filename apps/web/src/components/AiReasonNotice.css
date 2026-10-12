@@ -1,0 +1,19 @@
+/* Benannter KI-Grund (AiReasonNotice): Farbe und Groesse erbt der Baustein
+   von der Klasse der Stelle (status-error, placeholder-note, …); hier steht
+   nur, was die Aktion vom Text abhebt. */
+
+.ai-reason__hint {
+  font-weight: 500;
+}
+
+.ai-reason__action {
+  white-space: nowrap;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ai-reason__action:hover,
+.ai-reason__action:focus-visible {
+  text-decoration-thickness: 2px;
+}

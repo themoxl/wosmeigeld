@@ -1,0 +1,170 @@
+# Basis-Topologie fuer die Betriebsprofile "Privat/Home-Server" und
+# "Produktiv/SaaS" (Architekturplan Abschnitt 4). Fuer lokale Entwicklung
+# siehe docker-compose.dev.yml (Ueberlagerung mit Hot Reload und lokalem
+# Postgres) und README.md ("Schnellstart").
+#
+# Standardannahme: PostgreSQL/Auth/Storage laufen ueber (self-hosted oder
+# gemanagtes) Supabase, nicht ueber den "postgres"-Dienst hier. Wer ohne
+# Supabase self-hostet, aktiviert das "local-db"-Profil:
+#   docker compose --profile local-db up
+
+services:
+  web:
+    build:
+      # Build-Kontext ist das Repo-Root (nicht apps/web), damit das
+      # Dockerfile die pnpm-Workspace-Pakete packages/design-tokens und
+      # packages/contracts einbinden kann.
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: runtime
+      # Vite baut VITE_-Variablen zur Buildzeit in das Bundle ein, daher
+      # als Build-Arg statt als Laufzeit-Umgebungsvariable.
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+    image: finanzplaner-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    networks: [finanzplaner]
+
+  api:
+    build:
+      # Repo-Root als Kontext, damit services/worker/worker (von
+      # app/services/import_service.py per sys.path eingebunden) mitkopiert
+      # werden kann (siehe services/api/Dockerfile).
+      context: .
+      dockerfile: services/api/Dockerfile
+    image: finanzplaner-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HEALTH_DOCUMENTS_LOCAL_PATH: /health-documents
+    volumes:
+      - health-documents-data:/health-documents
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [finanzplaner]
+
+  worker:
+    build:
+      # Repo-Root als Kontext, damit services/api/app (KI-Kern app/llm,
+      # Vertragsabgleich u. a., ueber PYTHONPATH eingebunden) mitkopiert
+      # werden kann (siehe services/worker/Dockerfile).
+      context: .
+      dockerfile: services/worker/Dockerfile
+    image: finanzplaner-worker
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HEALTH_DOCUMENTS_LOCAL_PATH: /health-documents
+    volumes:
+      - health-documents-data:/health-documents
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [finanzplaner]
+
+  # Periodischer Scheduler (Phase 9: "Fixkosten in Kuerze"-Push) - eigener,
+  # leichtgewichtiger Prozess auf demselben Worker-Image statt neuer
+  # Infrastruktur, siehe services/worker/worker/actors.py und
+  # https://gitlab.com/bersace/periodiq. Nutzt SIGALRM (Unix-only) und laeuft
+  # daher ausschliesslich im Container, nicht nativ unter Windows.
+  periodiq:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    image: finanzplaner-worker
+    restart: unless-stopped
+    env_file: .env
+    command: ["periodiq", "-v", "worker.actors"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [finanzplaner]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    networks: [finanzplaner]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    # Host-Ports als Variablen statt fest 80/443: auf einem NAS gehoeren diese
+    # beiden Ports in aller Regel schon dem Betriebssystem des Geraets (auf der
+    # Ziel-NAS belegen sie dessen Weboberflaeche), und eine Compose-Ueberlagerung
+    # kann sie nicht loswerden - Compose HAENGT die Portlisten mehrerer Dateien
+    # aneinander, statt die spaetere gewinnen zu lassen. Ohne Variable bliebe nur,
+    # die gesamte Caddy-Definition in der Ueberlagerung zu wiederholen. Die
+    # Vorgabewerte halten alle anderen Profile unveraendert.
+    ports:
+      - "${CADDY_HTTP_PORT:-80}:80"
+      - "${CADDY_HTTPS_PORT:-443}:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      # Auch der Konfigurationspfad ist eine Variable (gleicher Grund wie bei
+      # den Ports oben): welche Liste beim Zusammenfuehren mehrerer
+      # Compose-Dateien gewinnt, haengt bei "volumes" von der Compose-Version
+      # ab. Docker Compose auf der Ziel-NAS ist v2.12 und damit aelter als die
+      # Regel "gleiches Ziel ersetzt". Ueber die Variable ist der Austausch
+      # eindeutig, statt von Versionsverhalten abzuhaengen.
+      - ${CADDY_CONFIG:-./infra/caddy/Caddyfile}:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    healthcheck:
+      # Absichtlich die (nur containerintern erreichbare) Admin-API statt der
+      # oeffentlichen Site: bei einer echten $DOMAIN passt der Host-Header
+      # eines simplen "localhost"-wget nicht zum Caddyfile-Routing.
+      test:
+        ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:2019/metrics"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    networks: [finanzplaner]
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    profiles: ["local-db"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-finanzplaner}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/docker/postgres-initdb:/docker-entrypoint-initdb.d:ro
+    networks: [finanzplaner]
+
+networks:
+  finanzplaner:
+
+volumes:
+  redis-data:
+  health-documents-data:
+  caddy-data:
+  caddy-config:
+  postgres-data:

@@ -1,0 +1,64 @@
+// Verlegt die C++-Zwischenstaende an einen kurzen Pfad.
+//
+// PROBLEM
+// CMake setzt die Objektdatei eines Moduls aus zwei Teilen zusammen: dem
+// Arbeitsverzeichnis der Bibliothek und dem gespiegelten Pfad der Quelldatei.
+// Unter pnpm sieht der erste Teil so aus:
+//
+//   <projektwurzel>/node_modules/.pnpm/react-native-screens@4.16.0_
+//   2558b9dce3e71a2edb7ae0becc62b1df/node_modules/react-native-screens/
+//   android/.cxx/RelWithDebInfo/1v496368/arm64-v8a/CMakeFiles/rnscreens.dir/
+//
+// gut 200 Zeichen - und der zweite Teil wiederholt denselben langen Pfad
+// noch einmal. CMake laesst hoechstens 250 Zeichen zu (CMAKE_OBJECT_PATH_MAX)
+// und legt die Datei sonst nicht an. Ninja findet die angekuendigte Datei dann
+// nie vor, haelt das Manifest fuer veraltet, laesst CMake neu erzeugen - und
+// bricht nach hundert Anlaeufen ab:
+//
+//   ninja: error: manifest 'build.ninja' still dirty after 100 tries
+//
+// Der lange Pfad kommt aus dem Ablagemuster von pnpm (jedes Paket in einem
+// eigenen, mit einem Hash versehenen Ordner). Auf Linux und macOS faellt das
+// nicht auf, dort gibt es die Grenze nicht.
+//
+// LOESUNG
+// buildStagingDirectory verlegt den .cxx-Ordner aus dem Paketverzeichnis an
+// einen kurzen Ort. Der gespiegelte Quellpfad bleibt lang, aber die Summe
+// passt wieder.
+//
+// WARUM ALS INIT-SKRIPT
+// Die naheliegende Stelle waere die build.gradle der jeweiligen Bibliothek -
+// die gehoert aber fremden Paketen. Die zweite Moeglichkeit, android/build.gradle
+// des Projekts, schreibt `expo prebuild` bei jedem Lauf neu. Ein Init-Skript
+// liegt ausserhalb von beidem und wird beim Aufruf mitgegeben (siehe
+// scripts/build-apk.ps1).
+
+// NICHT VERSCHOBEN WIRD DAS AUSGABEVERZEICHNIS DER BIBLIOTHEKEN
+// Naheliegend waere, gleich auch build/ umzuhaengen - dort entstehen unter
+// build/generated/source/codegen/jni die C++-Quellen der neuen
+// React-Native-Architektur, und auch die reissen die Pfadgrenze. Es geht aber
+// nicht: die Verknuepfungsdatei, die React Native fuer die App erzeugt
+// (Android-autolinking.cmake), berechnet diese Pfade fest aus dem
+// PAKETordner - nicht aus dem, was Gradle als Ausgabeverzeichnis kennt.
+// Verschiebt man build/, zeigt die Datei ins Leere:
+//
+//   CMake Error at Android-autolinking.cmake:9 (add_subdirectory)
+//
+// Dasselbe gilt fuer die Verbindung zwischen reanimated und worklets, die
+// ebenfalls ueber einen fest eingetragenen Pfad laeuft. Die Laenge der
+// Codegen-Pfade ist deshalb an der Wurzel geloest, ueber virtual-store-dir in
+// der .npmrc - siehe dort.
+
+def cxxRoot = System.getenv('FINANZPLANER_CXX_DIR') ?: 'C:/fp-cxx'
+
+gradle.beforeProject { project ->
+    ['com.android.library', 'com.android.application'].each { pluginId ->
+        project.plugins.withId(pluginId) {
+            // Je Modul ein eigener Unterordner - sonst wuerden sich die
+            // Bibliotheken gegenseitig ueberschreiben. Der Modulname ist
+            // innerhalb eines Gradle-Builds eindeutig.
+            project.android.externalNativeBuild.cmake.buildStagingDirectory =
+                new File(cxxRoot, project.name)
+        }
+    }
+}

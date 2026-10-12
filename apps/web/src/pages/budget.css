@@ -1,0 +1,60 @@
+/* Budgetseite: nur das, was es ausserhalb der Komponenten wirklich neu gibt.
+   BudgetFlow, BucketSplit und AnnualMatrixTable bringen ihr eigenes CSS mit;
+   hier steht ausschliesslich die Gruppenzeile der Kategorietabelle.
+
+   Wie in reimbursements.css: Vite buendelt global, es gibt keine Kapselung -
+   deshalb ausnahmslos das Praefix .budget-group-*. Farben kommen nur aus den
+   Semantik-Tokens oder aus color-mix() gegen --color-surface, damit hell und
+   dunkel ohne Zusatzregel mitkippen. */
+
+.budget-group-row {
+  background: var(--color-background);
+  font-weight: 600;
+}
+
+/* Optischer Code der Zeile: eine gruene Kante links heisst "hier stehen auch
+   Einnahmen". Ohne sie liest man zwei Betraege in derselben Spalte und haelt
+   den geplanten Zufluss fuer ein Ausgabenbudget. */
+.budget-group-row--income td:first-child {
+  box-shadow: inset 3px 0 0 var(--color-positive);
+}
+
+/* Kein display:flex auf der Zelle - ein <td> verliert damit seine
+   Tabellenrolle und die Spaltenbreiten laufen auseinander. Das Badge ist
+   ohnehin inline-flex. */
+.budget-group-row__name .status-badge {
+  margin-left: var(--space-2);
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.budget-group-row__note {
+  font-weight: 400;
+}
+
+/* Plan-, Ist- und Restspalte: eine Zeile je Geldart, nie eine Summe daraus. */
+.budget-group-amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.budget-group-amounts__value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Das Kurzwort vor der Einnahmezahl. Klein und leise, aber vorhanden: zwei
+   blanke Betraege untereinander waeren nicht zuzuordnen. */
+.budget-group-amounts__tag {
+  margin-right: var(--space-1);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
