@@ -188,24 +188,16 @@ Zugangsdaten erforderlich.
 
 [GNU Affero General Public License v3.0](LICENSE).
 
-Kurz: nutzen, aendern und weitergeben ist erlaubt. Wer eine geaenderte
-Fassung weitergibt **oder sie ueber ein Netzwerk anderen zugaenglich macht**,
-muss den vollstaendigen Quelltext dieser Fassung unter derselben Lizenz
-herausgeben. Der eigene Betrieb im Haushalt loest das nicht aus - dafuer
-braucht es keine Erlaubnis und keine Veroeffentlichung.
+Nutzung, Änderung und Weitergabe sind erlaubt. Wer eine geänderte
+Fassung weitergibt **oder sie anderen über ein Netzwerk zugänglich macht**,
+muss den vollständigen Quelltext dieser Fassung unter derselben Lizenz
+herausgeben. Der eigene Betrieb im Haushalt löst das nicht aus – dafür
+braucht es keine Erlaubnis und keine Veröffentlichung.
 
-Sicherheitsluecken bitte nicht als Issue melden, sondern nach
+Sicherheitslücken bitte nicht als Issue melden, sondern nach
 [SECURITY.md](SECURITY.md).
 
 ## Haftungsausschluss
 
 Dieses Projekt ist ein privates Werkzeug und **keine Finanz-, Steuer- oder
 Rechtsberatung**.
-
-Die mitgelieferten Förderprogramme unter
-`services/api/app/data/funding_packages/` geben öffentlich veröffentlichte
-Konditionen von KfW, BAFA und BayernLabo zum jeweils vermerkten
-Recherchestand wieder (Feld `researched_on`, Quelle je Programm als
-`official_url`). Förderkonditionen ändern sich laufend. **Verbindlich ist
-ausschließlich die offizielle Quelle** — vor jeder Entscheidung dort prüfen.
-Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen.
